@@ -23,6 +23,7 @@
 #include <QTreeView>
 #include <QSettings>
 #include <QDir>
+#include <QPushButton>
 
 // CTK widget includes
 #include <ctkDICOMQueryRetrieveWidget.h>
@@ -30,6 +31,7 @@
 // ctkDICOMCore includes
 #include "ctkDICOM.h"
 #include "ctkDICOMModel.h"
+#include "ctkDICOMIndexer.h"
 
 // Logger
 #include "ctkLogger.h"
@@ -42,6 +44,7 @@ int main(int argc, char** argv)
   ctkLogger::configure();
   QApplication app(argc, argv);
 
+  // for settings
   app.setOrganizationName("commontk");
   app.setOrganizationDomain("commontk.org");
   app.setApplicationName("ctkDICOM");
@@ -50,6 +53,7 @@ int main(int argc, char** argv)
   QString databaseDirectory;
 
   // set up the database 
+  // - use command line argument if one is given, otherwise use default
   if (argc > 1)
     {
     QString directory(argv[1]);
@@ -66,6 +70,7 @@ int main(int argc, char** argv)
     databaseDirectory = settings.value("DatabaseDirectory", "").toString();
   }
 
+  // create the database directory
   QDir qdir(databaseDirectory);
   if ( !qdir.exists(databaseDirectory) ) 
   {
@@ -77,6 +82,7 @@ int main(int argc, char** argv)
   }
 
 
+  // load the database
   QString databaseFileName = databaseDirectory + QString("/ctkDICOM.sql");
 
   ctkDICOM myCTK;
@@ -88,9 +94,13 @@ int main(int argc, char** argv)
     return EXIT_FAILURE;
   }
 
+  // set up the data model for the database
+  // - this is a map from sql database to qt callable representation
   ctkDICOMModel model;
   model.setDatabase(myCTK.database());
   
+  // create the query/retrieve widget
+  // - associate the tree view with the database model
   ctkDICOMQueryRetrieveWidget queryRetrieve;
   QTreeView *treeView = queryRetrieve.findChild<QTreeView *>("treeView");
   if (!treeView)
@@ -99,6 +109,10 @@ int main(int argc, char** argv)
     return EXIT_FAILURE;
     }
   treeView->setModel(&model);
+
+  // connect the Add button for the local database
+  QPushButton *addButton = queryRetrieve.findChild<QPushButton *>("addToDatabase");
+  connect(addButton, SIGNAL("clicked()"), this
 
   queryRetrieve.show();
   queryRetrieve.raise();

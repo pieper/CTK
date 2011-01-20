@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 
   // connect the Add button for the local database
   QPushButton *addButton = queryRetrieve.findChild<QPushButton *>("addToDatabase");
-  connect(addButton, SIGNAL("clicked()"), this
+  //TODO: this should be moved into the ctkLibrary widget: connect(addButton, SIGNAL("clicked()"), this
 
   queryRetrieve.show();
   queryRetrieve.raise();

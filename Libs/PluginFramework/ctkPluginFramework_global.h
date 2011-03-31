@@ -27,10 +27,10 @@
 #include <QStringList>
 #include <QVariant>
 
-#include "ctkCaseInsensitiveString.h"
-
-typedef QHash<ctkCaseInsensitiveString, QVariant> ServiceProperties;
-typedef QHash<ctkCaseInsensitiveString, QVariant> ctkDictionary;
+/**
+ * \ingroup PluginFramework
+ * @{
+ */
 typedef QHash<QString, QVariant> ctkProperties;
 
 #if QT_VERSION < 0x040700
@@ -42,13 +42,14 @@ inline uint qHash(const QSharedPointer<T>& ptr)
 }
 #endif
 
-
+//----------------------------------------------------------------------------
 template<class A>
 QStringList getIIDs()
 {
-  return QString(qobject_interface_iid<A*>());
+  return QStringList(qobject_interface_iid<A*>());
 }
 
+//----------------------------------------------------------------------------
 template<class A, class B>
 QStringList getIIDs()
 {
@@ -58,6 +59,7 @@ QStringList getIIDs()
   return ids;
 }
 
+//----------------------------------------------------------------------------
 template<class A, class B, class C>
 QStringList getIIDs()
 {
@@ -68,6 +70,7 @@ QStringList getIIDs()
   return ids;
 }
 
+//----------------------------------------------------------------------------
 template<class A, class B, class C, class D>
 QStringList getIIDs()
 {
@@ -78,5 +81,7 @@ QStringList getIIDs()
   ids << qobject_interface_iid<D*>();
   return ids;
 }
+
+/** @}*/
 
 #endif // CTKPLUGINFRAMEWORK_GLOBAL_H

@@ -29,11 +29,11 @@
 #include "ctkAbstractFileBasedFactory.h"
 
 //----------------------------------------------------------------------------
+/// \ingroup Core
 template<typename BaseClassType>
 class ctkFactoryPluginItem : public ctkAbstractFactoryFileBasedItem<BaseClassType>
 {
 public:
-  explicit ctkFactoryPluginItem(const QString& path);
   virtual bool load();
   virtual QString loadErrorString()const;
 
@@ -45,22 +45,13 @@ private:
 };
 
 //----------------------------------------------------------------------------
+/// \ingroup Core
 template<typename BaseClassType>
 class ctkAbstractPluginFactory : public ctkAbstractFileBasedFactory<BaseClassType>
 {
-public:
-  /// Constructor
-  explicit ctkAbstractPluginFactory();
-
-  /// Register a plugin in the factory
-  virtual bool registerLibrary(const QString& key, const QFileInfo& file);
-
 protected:
-  virtual ctkAbstractFactoryItem<BaseClassType>* createFactoryPluginItem(const QFileInfo& file);
-
-private:
-  ctkAbstractPluginFactory(const ctkAbstractPluginFactory &);  /// Not implemented
-  void operator=(const ctkAbstractPluginFactory&); /// Not implemented
+  virtual bool isValidFile(const QFileInfo& file)const;
+  virtual ctkAbstractFactoryItem<BaseClassType>* createFactoryFileBasedItem();
 };
 
 #include "ctkAbstractPluginFactory.tpp"

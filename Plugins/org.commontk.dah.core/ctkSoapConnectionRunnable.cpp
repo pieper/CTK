@@ -19,41 +19,49 @@
 
 =============================================================================*/
 
-
-#include "ctkSoapConnectionRunnable_p.h"
-
+// Qt includes
 #include <QTcpSocket>
 
+// CTK includes
+#include "ctkSoapConnectionRunnable_p.h"
+#include "ctkSoapLog.h"
+
+//----------------------------------------------------------------------------
 ctkSoapConnectionRunnable::ctkSoapConnectionRunnable(int socketDescriptor)
-  : socketDescriptor(socketDescriptor)
+  : socketDescriptor(socketDescriptor), isAboutToQuit(0)
 {
+  connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(aboutToQuit()));
 }
 
+//----------------------------------------------------------------------------
 ctkSoapConnectionRunnable::~ctkSoapConnectionRunnable()
 {
 
 }
 
+//----------------------------------------------------------------------------
 void ctkSoapConnectionRunnable::run()
 {
   QTcpSocket tcpSocket;
   if (!tcpSocket.setSocketDescriptor(socketDescriptor))
-  {
+    {
     // error handling
     return;
-  }
+    }
 
+  const int timeout = 1 * 1000;
+  while (tcpSocket.state() == QTcpSocket::ConnectedState &&
+         isAboutToQuit.fetchAndAddOrdered(0) == 0)
+    {
 
-  while (tcpSocket.state() == QTcpSocket::ConnectedState)
-  {
-    //const int timeout = 5 * 1000;
-
-    tcpSocket.waitForReadyRead(-1);
+    tcpSocket.waitForReadyRead(timeout);
 
     readClient(tcpSocket);
-  }
+    }
+
 }
 
+//----------------------------------------------------------------------------
 void ctkSoapConnectionRunnable::readClient(QTcpSocket& socket)
 {
   QString requestType;
@@ -61,72 +69,73 @@ void ctkSoapConnectionRunnable::readClient(QTcpSocket& socket)
   //qDebug() << socket->readAll();
   while (socket.canReadLine()) {
     QString line = socket.readLine();
-    qDebug() << line;
+    CTK_SOAP_LOG_LOWLEVEL( << line );
     if(line.contains("?wsdl HTTP"))
-    {
+      {
       requestType = "?wsdl";
-    }
+      }
     if(line.contains("?xsd=1"))
-    {
+      {
       requestType = "?xsd=1";
-    }
+      }
     if(line.contains("SoapAction"))
-    {
+      {
       requestType = line;
-    }
+      }
     if(line.contains("Content-Length: "))
-    {
+      {
       contentLength = line.section(':',1).trimmed().toInt();
-    }
+      }
     if (line.trimmed().isEmpty())
-    {
+      {
       QString content;
       if(requestType.startsWith("?"))
-      {
+        {
         QByteArray body = socket.readAll();
         emit incomingWSDLMessage(requestType, &content);
-      }
+        }
       else
-      {
+        {
         // Read the http body, which contains the soap message
         int bytesRead = 0;
         QByteArray body;
         while(body.size() < contentLength)
-        {
+          {
           QByteArray bodyPart = socket.read(contentLength);
-          qDebug() << bodyPart;
+          CTK_SOAP_LOG_LOWLEVEL( << bodyPart );
           bytesRead += bodyPart.size();
           body.append(bodyPart);
-          qDebug() << " Expected content-length: " << contentLength << ". Bytes read so far: " << body.size();
+          CTK_SOAP_LOG_LOWLEVEL( << " Expected content-length: " << contentLength << ". Bytes read so far: " << body.size() );
           if (body.size()<contentLength)
-          {
-            qDebug() << " Message body too small. Trying to read more.";
+            {
+            qCritical() << " Message body too small. Trying to read more.";
             socket.waitForReadyRead(-1);
+            }
           }
-        }
         if(body.trimmed().isEmpty()==false)
-        {
+          {
           QtSoapMessage msg;
           if (!msg.setContent(body))
-          {
-            qDebug() << "QtSoap import failed:" << msg.errorString();
+            {
+            qCritical() << "QtSoap import failed:" << msg.errorString();
             return;
-          }
+            }
 
           QtSoapMessage reply;
+          CTK_SOAP_LOG(<< "###################" << msg.toXmlString());
           emit incomingSoapMessage(msg, &reply);
 
           if (reply.isFault())
-          {
-            qDebug() << "QtSoap reply faulty";
+            {
+            qCritical() << "QtSoap reply faulty";
             return;
-          }
+            }
 
-          qDebug() << "SOAP reply:";
+          CTK_SOAP_LOG_LOWLEVEL( << "SOAP reply:" );
 
           content = reply.toXmlString();
+          }
         }
-      }
 
       QByteArray block;
       block.append("HTTP/1.1 200 OK\n");
@@ -136,12 +145,17 @@ void ctkSoapConnectionRunnable::readClient(QTcpSocket& socket)
 
       block.append(content);
 
-      qDebug() << block;
+      CTK_SOAP_LOG_LOWLEVEL( << block );
 
       socket.write(block);
 
       requestType = "";
       contentLength = -1;
+      }
     }
-  }
+}
+
+void ctkSoapConnectionRunnable::aboutToQuit()
+{
+  isAboutToQuit.testAndSetOrdered(0, 1);
 }

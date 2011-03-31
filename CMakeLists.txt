@@ -168,6 +168,7 @@ INCLUDE(CMake/ctkFunctionGeneratePluginManifest.cmake)
 INCLUDE(CMake/ctkMacroGeneratePluginResourceFile.cmake)
 INCLUDE(CMake/ctkFunctionCheckCompilerFlags.cmake)
 INCLUDE(CMake/ctkFunctionGetIncludeDirs.cmake)
+INCLUDE(CMake/ctkFunctionGetLibraryDirs.cmake)
 INCLUDE(CMake/ctkFunctionGetGccVersion.cmake)
 
 #-----------------------------------------------------------------------------
@@ -217,7 +218,8 @@ OPTION(WITH_COVERAGE "Enable/Disable coverage" OFF)
 OPTION(DOCUMENTATION_TARGET_IN_ALL "Include the custom target for building documentation in 'all'" OFF)
 MARK_AS_ADVANCED(DOCUMENTATION_TARGET_IN_ALL)
 
-OPTION(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY "Where documentation archives should be stored" ${CMAKE_CURRENT_BINARY_DIR})
+SET(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+ CACHE PATH "Where documentation archives should be stored")
 MARK_AS_ADVANCED(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY)
 
 #-----------------------------------------------------------------------------
@@ -257,7 +259,8 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
   SET(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
   
   ctkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
-  
+  ctkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
+
   ctkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
   # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so
   # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
@@ -272,6 +275,13 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
   
   SET(CTK_C_FLAGS "${cflags} ${CTK_C_FLAGS}")
   SET(CTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${CTK_CXX_FLAGS}")
+ENDIF()
+
+IF(MSVC)
+  SET(msvc_suppressed_warnings
+    "/wd4290" # C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+  )
+  SET(CTK_CXX_FLAGS "${CTK_CXX_FLAGS} ${msvc_suppressed_warnings}")
 ENDIF()
 
 #-----------------------------------------------------------------------------
@@ -293,7 +303,8 @@ SET(CTK_LIBS
   Widgets:OFF
   DICOM/Core:OFF
   DICOM/Widgets:OFF
-  Messaging/Core:OFF
+  ImageProcessing/ITK/Core:OFF
+  #Messaging/Core:OFF  # MessagingCore library need some love :) - Let's disable it for now :(
   Scripting/Python/Core:OFF
   Scripting/Python/Widgets:OFF
   Visualization/VTK/Core:OFF
@@ -306,15 +317,17 @@ SET(CTK_LIBS
 #
 SET(CTK_PLUGINS
   org.commontk.eventbus:OFF
-  org.commontk.cli:OFF
+  #org.commontk.cli:OFF # MessagingCore library need some love :) - Let's disable it for now :(
   org.commontk.configadmin:OFF
   org.commontk.dah.app:OFF
   org.commontk.dah.core:OFF
   org.commontk.dah.exampleapp:OFF
   org.commontk.dah.examplehost:OFF
   org.commontk.dah.host:OFF
+  org.commontk.eventadmin:OFF
   org.commontk.log:OFF
   org.commontk.log4qt:OFF
+  org.commontk.metatype:OFF
   org.commontk.plugingenerator.core:OFF
   org.commontk.plugingenerator.ui:OFF
   org.commontk.qtmobility.service:OFF
@@ -330,10 +343,12 @@ SET(CTK_APPLICATIONS
   ctkDICOMDemoSCU:OFF
   ctkDICOMQuery:OFF
   ctkDICOMRetrieve:OFF
+  ctkDICOMQueryRetrieve:OFF
   ctkExampleHost:OFF
   ctkExampleHostedApp:OFF
   ctkPluginBrowser:OFF
   ctkPluginGenerator:OFF
+  ctkDICOMObjectViewer:OFF
   ctkSimplePythonShell:OFF
   )
   
@@ -537,7 +552,7 @@ IF(CTK_SUPERBUILD)
 ENDIF()
 
 #-----------------------------------------------------------------------------
-# Expand variables containing include directories for external projects
+# Expand variables containing include and library directories for external projects
 # This relies on the variable EXTERNAL_TARGETS set in ctkMacroValidateBuildOptions
 FOREACH(_external_target ${EXTERNAL_TARGETS})
   IF(${_external_target}_FIND_PACKAGE_CMD)
@@ -562,6 +577,23 @@ FOREACH(_external_target ${EXTERNAL_TARGETS})
         #MESSAGE("[${_external_target}] New dirs: ${${_external_target}_INCLUDE_DIRS}")
       ENDFOREACH()
       #MESSAGE("[${_external_target}] Appended dirs: ${${_external_target}_INCLUDE_DIRS}")
+    ENDIF()
+  ENDIF()
+  IF(${_external_target}_LIBRARY_DIRS)
+    STRING(REPLACE "^" ";" _library_variable_list "${${_external_target}_LIBRARY_DIRS}")
+    IF(_library_variable_list)
+      #MESSAGE("[${_external_target}] Resolving library variables: ${${_external_target}_LIBRARY_DIRS}")
+      SET(${_external_target}_LIBRARY_DIRS "")
+      FOREACH(_library_variable ${_library_variable_list})
+        #MESSAGE("[${_external_target}] Appending ${${_library_variable}}")
+        IF(${_library_variable})
+          LIST(APPEND ${_external_target}_LIBRARY_DIRS ${${_library_variable}})
+        ELSE()
+          LIST(APPEND ${_external_target}_LIBRARY_DIRS ${_library_variable})
+        ENDIF()
+        #MESSAGE("[${_external_target}] New dirs: ${${_external_target}_LIBRARY_DIRS}")
+      ENDFOREACH()
+      #MESSAGE("[${_external_target}] Appended dirs: ${${_external_target}_LIBRARY_DIRS}")
     ENDIF()
   ENDIF()
 ENDFOREACH()

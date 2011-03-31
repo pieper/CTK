@@ -21,10 +21,10 @@
 
 #include "ctkServiceRegistrationPrivate.h"
 
-
+//----------------------------------------------------------------------------
 ctkServiceRegistrationPrivate::ctkServiceRegistrationPrivate(
   ctkPluginPrivate* plugin, QObject* service,
-  const ServiceProperties& props)
+  const ctkDictionary& props)
   : ref(1), service(service), plugin(plugin), reference(this),
     properties(props), available(true), unregistering(false),
     propsLock(QMutex::Recursive)
@@ -32,17 +32,20 @@ ctkServiceRegistrationPrivate::ctkServiceRegistrationPrivate(
 
 }
 
+//----------------------------------------------------------------------------
 ctkServiceRegistrationPrivate::~ctkServiceRegistrationPrivate()
 {
 
 }
 
+//----------------------------------------------------------------------------
 bool ctkServiceRegistrationPrivate::isUsedByPlugin(QSharedPointer<ctkPlugin> p)
 {
   QHash<QSharedPointer<ctkPlugin>, int> deps = dependents;
   return deps.contains(p);
 }
 
+//----------------------------------------------------------------------------
 QObject* ctkServiceRegistrationPrivate::getService()
 {
   return service;

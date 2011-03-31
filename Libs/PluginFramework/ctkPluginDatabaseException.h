@@ -22,14 +22,12 @@
 #ifndef CTKPLUGINDATABASEEXCEPTION_H
 #define CTKPLUGINDATABASEEXCEPTION_H
 
-#include "ctkPluginFrameworkExport.h"
+#include "ctkRuntimeException.h"
 
-#include <stdexcept>
-
-#include <QString>
-
-
-class CTK_PLUGINFW_EXPORT ctkPluginDatabaseException : public std::runtime_error
+/**
+ * \ingroup PluginFramework
+ */
+class Q_DECL_EXPORT ctkPluginDatabaseException : public ctkRuntimeException
 {
 public:
 
@@ -44,26 +42,23 @@ public:
     DB_SQL_ERROR
   };
 
-  ctkPluginDatabaseException(const QString& msg, const Type& type = UNSPECIFIED, const std::exception& cause = std::exception());
-  ctkPluginDatabaseException(const QString& msg, const std::exception& cause);
+  ctkPluginDatabaseException(const QString& msg, const Type& type = UNSPECIFIED, const std::exception* cause = 0);
+  ctkPluginDatabaseException(const QString& msg, const std::exception* cause);
 
   ctkPluginDatabaseException(const ctkPluginDatabaseException& o);
   ctkPluginDatabaseException& operator=(const ctkPluginDatabaseException& o);
 
-  ~ctkPluginDatabaseException() throw() {}
-
-  std::exception getCause() const;
-  void setCause(const std::exception&) throw(std::logic_error);
   Type getType() const;
-
 
 private:
 
   Type type;
-  std::exception cause;
+
 };
 
-
+/**
+ * \ingroup PluginFramework
+ */
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug dbg, const ctkPluginDatabaseException& exc);
 
 #endif // CTKPLUGINDATABASEEXCEPTION_H

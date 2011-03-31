@@ -46,9 +46,9 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_BINARY_DIR}/ctkScriptingPythonCoreConfigure.h
   )
 
-# Target libraries - See CMake/ctkMacroGetTargetLibraries.cmake
+# Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
-ctkMacroGetTargetLibraries(KIT_target_libraries)
+ctkFunctionGetTargetLibraries(KIT_target_libraries)
 
 # Link against vtkPython if required
 IF(CTK_LIB_Scripting/Python/Core_PYTHONQT_USE_VTK)
@@ -64,6 +64,7 @@ ctkMacroBuildLib(
   TARGET_LIBRARIES ${KIT_target_libraries}
   RESOURCES ${KIT_resources}
   LIBRARY_TYPE ${CTK_LIBRARY_MODE}
+  DISABLE_WRAP_PYTHONQT
   )
 
 # Plugins

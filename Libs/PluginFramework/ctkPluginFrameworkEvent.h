@@ -23,6 +23,8 @@
 #define CTKPLUGINFRAMEWORKEVENT_H
 
 #include <QSharedDataPointer>
+#include <QSharedPointer>
+#include <QMetaType>
 
 #include "ctkPluginFrameworkExport.h"
 
@@ -32,6 +34,8 @@ class ctkPlugin;
 class ctkPluginFrameworkEventData;
 
 /**
+ * \ingroup PluginFramework
+ *
  * A general event from the Framework.
  *
  * <p>
@@ -140,7 +144,7 @@ public:
    * @param plugin The event source.
    * @param fwException The related exception.
    */
-  ctkPluginFrameworkEvent(Type type, ctkPlugin* plugin, const std::exception& fwException);
+  ctkPluginFrameworkEvent(Type type, QSharedPointer<ctkPlugin> plugin, const std::exception& fwException);
 
   /**
    * Creates a Framework event regarding the specified plugin.
@@ -148,7 +152,7 @@ public:
    * @param type The event type.
    * @param plugin The event source.
    */
-  ctkPluginFrameworkEvent(Type type, ctkPlugin* plugin);
+  ctkPluginFrameworkEvent(Type type, QSharedPointer<ctkPlugin> plugin);
 
   ctkPluginFrameworkEvent(const ctkPluginFrameworkEvent& other);
 
@@ -167,7 +171,7 @@ public:
    *
    * @return The plugin associated with the event.
    */
-  ctkPlugin* getPlugin() const;
+  QSharedPointer<ctkPlugin> getPlugin() const;
 
   /**
    * Returns the type of framework event.
@@ -178,7 +182,6 @@ public:
    * <li>{@link #ERROR}
    * <li>{@link #WARNING}
    * <li>{@link #INFO}
-   * <li>{@link #STARTLEVEL_CHANGED}
    * <li>{@link #STOPPED}
    * <li>{@link #STOPPED_UPDATE}
    * <li>{@link #WAIT_TIMEDOUT}
@@ -189,7 +192,14 @@ public:
   Type getType() const;
 };
 
+Q_DECLARE_METATYPE(ctkPluginFrameworkEvent);
+
+/**
+ * \ingroup PluginFramework
+ * @{
+ */
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug dbg, ctkPluginFrameworkEvent::Type type);
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug dbg, const ctkPluginFrameworkEvent& event);
+/** @} */
 
 #endif // CTKPLUGINFRAMEWORKEVENT_H

@@ -29,13 +29,14 @@
 #include "ctkAbstractFactory.h"
 
 //----------------------------------------------------------------------------
+/// \ingroup Core
 template<typename BaseClassType>
-class ctkAbstractFactoryFileBasedItem : public ctkAbstractFactoryItem<BaseClassType>
+class ctkAbstractFactoryFileBasedItem
+  : public ctkAbstractFactoryItem<BaseClassType>
 {
 public:
-  explicit ctkAbstractFactoryFileBasedItem(const QString& path);
- 
   /// Get path associated with the object identified by \a key
+  void setPath(const QString& path);
   QString path()const;
 
 private:
@@ -43,21 +44,25 @@ private:
 };
 
 //----------------------------------------------------------------------------
+/// \ingroup Core
 template<typename BaseClassType>
 class ctkAbstractFileBasedFactory : public ctkAbstractFactory<BaseClassType>
 {
 public:
-
-  /// Constructor
-  explicit ctkAbstractFileBasedFactory();
-  virtual ~ctkAbstractFileBasedFactory();
-
   /// Get path associated with the library identified by \a key
   virtual QString path(const QString& key);
 
-private:
-  ctkAbstractFileBasedFactory(const ctkAbstractFileBasedFactory &);  /// Not implemented
-  void operator=(const ctkAbstractFileBasedFactory&); /// Not implemented
+  bool registerFileItem(const QFileInfo& file);
+  bool registerFileItem(const QString& key, const QFileInfo& file);
+
+protected:
+  void registerAllFileItems(const QStringList& directories);
+
+  virtual bool isValidFile(const QFileInfo& file)const;
+  virtual ctkAbstractFactoryItem<BaseClassType>* createFactoryFileBasedItem();
+  virtual void initItem(ctkAbstractFactoryItem<BaseClassType>* item);
+
+  virtual QString fileNameToKey(const QString& objectName)const;
 };
 
 #include "ctkAbstractFileBasedFactory.tpp"

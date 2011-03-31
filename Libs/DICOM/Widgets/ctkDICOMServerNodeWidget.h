@@ -23,6 +23,9 @@
 
 // Qt includes 
 #include <QWidget>
+#include <QString>
+#include <QList>
+#include <QMap>
 
 #include "ctkDICOMWidgetsExport.h"
 
@@ -37,20 +40,49 @@ public:
   explicit ctkDICOMServerNodeWidget(QWidget* parent=0);
   virtual ~ctkDICOMServerNodeWidget();
 
+  /// "FINDSCU" by default
+  QString                callingAETitle()const;
+  /// "CTKSTORE" by default
+  QString                storageAETitle()const;
+  /// 11112 by default
+  int                    storagePort()const;
+  /// Utility function that returns the callingAETitle, storageAETitle and
+  /// storagePort in a map
+  QMap<QString,QVariant> parameters()const;
 
-  /// set properties of query based on current widget state
-  void populateQuery (/*ctkDICOMQuery &query*/);
+  /// Return the list of server names
+  QStringList            serverNodes()const;
+  /// Return the list of selected(checked) server names 
+  QStringList            selectedServerNodes()const;
+  /// Return all the information associated to a server defined by its name
+  QMap<QString,QVariant> serverNodeParameters(const QString &serverNode)const;
+  QMap<QString,QVariant> serverNodeParameters(int row)const;
+  
+  /// Add a server node with the given parameters
+  /// Return the row index added into the table
+  int addServerNode(const QMap<QString, QVariant>& parameters);
 
 public slots:
-  void addNode ();
-  void removeNode ();
-  void onCellChanged (int row, int column);
-  void onCurrentItemChanged(QTableWidgetItem* current, QTableWidgetItem *previous);
-  void saveSettings ();
+  /// Add an empty server node and make it current
+  /// Return the row index added into the table
+  int addServerNode();
+  /// Remove the current row (different from the checked rows)
+  void removeCurrentServerNode();
+
+  void readSettings();
+  void saveSettings();
+
+protected slots:
+  void updateRemoveButtonEnableState();
 
 protected:
   QScopedPointer<ctkDICOMServerNodeWidgetPrivate> d_ptr;
-
+  enum ServerColumns{
+    NameColumn = 0,
+    AETitleColumn,
+    AddressColumn,
+    PortColumn
+  };
 private:
   Q_DECLARE_PRIVATE(ctkDICOMServerNodeWidget);
   Q_DISABLE_COPY(ctkDICOMServerNodeWidget);

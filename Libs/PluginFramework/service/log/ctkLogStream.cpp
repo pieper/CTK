@@ -23,6 +23,7 @@
 #include "ctkLogStream.h"
 #include "ctkLogService.h"
 
+//----------------------------------------------------------------------------
 ctkLogStream::ctkLogStream(ctkLogService* logService, int level, const std::exception* exc,
                            const char* file, const char* function, int line)
   : logged(false), logService(logService), level(level), exc(exc),
@@ -31,6 +32,7 @@ ctkLogStream::ctkLogStream(ctkLogService* logService, int level, const std::exce
   ts.setString(&msg);
 }
 
+//----------------------------------------------------------------------------
 ctkLogStream::ctkLogStream(const ctkLogStream& logStream)
  : msg(logStream.msg), logged(false),
    logService(logStream.logService), level(logStream.level),
@@ -40,44 +42,12 @@ ctkLogStream::ctkLogStream(const ctkLogStream& logStream)
   ts.setString(&msg);
 }
 
+//----------------------------------------------------------------------------
 ctkLogStream::~ctkLogStream()
 {
   if (!logged && logService)
   {
     logService->log(level, msg, exc, file, function, line);
   }
-}
-
-
-ctkLogStreamWithServiceRef::ctkLogStreamWithServiceRef(ctkLogService* logService, const ctkServiceReference& sr,
-                                                       int level, const std::exception* exc, const char* file,
-                                                       const char* function, int line)
-  : ctkLogStream(logService, level, exc, file, function, line), sr(sr)
-{
-
-}
-
-ctkLogStreamWithServiceRef::ctkLogStreamWithServiceRef(const ctkLogStreamWithServiceRef &logStreamWithRef)
- : ctkLogStream(logStreamWithRef), sr(logStreamWithRef.sr)
-{
-
-}
-
-ctkLogStreamWithServiceRef::~ctkLogStreamWithServiceRef()
-{
-  if (!logged)
-  {
-    logService->log(sr, level, msg, exc, file, function, line);
-    logged = true;
-  }
-}
-
-
-ctkNullLogStream::ctkNullLogStream() : ctkLogStream(0, 0)
-{}
-
-ctkNullLogStream::~ctkNullLogStream()
-{
-  logged = true;
 }
 

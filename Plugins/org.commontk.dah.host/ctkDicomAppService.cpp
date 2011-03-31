@@ -21,58 +21,64 @@
 
 #include "ctkDicomAppService.h"
 
-#include "ctkDicomServicePrivate.h"
+#include "ctkSimpleSoapClient.h"
 
 #include "ctkDicomAppHostingTypesHelper.h"
 
-ctkDicomAppService::ctkDicomAppService(ushort port, QString path):
-  d(new ctkDicomServicePrivate(port, path)), service(port, path)
+//----------------------------------------------------------------------------
+ctkDicomAppService::ctkDicomAppService(ushort port, QString path)
+  : ctkDicomExchangeService(port, path)
 {
 }
 
+//----------------------------------------------------------------------------
 ctkDicomAppService::~ctkDicomAppService()
 {
 }
 
+//----------------------------------------------------------------------------
 ctkDicomAppHosting::State ctkDicomAppService::getState()
 {
-  //Q_D(ctkDicomService);
-  const QtSoapType & result = d->askHost("getState", NULL);
+  const QtSoapType & result = submitSoapRequest("getState", NULL);
   return ctkDicomSoapState::getState(result);
 }
 
+//----------------------------------------------------------------------------
 bool ctkDicomAppService::setState(ctkDicomAppHosting::State newState)
 {
-  //Q_D(ctkDicomService);
   QtSoapType* input = new ctkDicomSoapState("newState", newState);
-  const QtSoapType & result = d->askHost("setState", input);
+  const QtSoapType & result = submitSoapRequest("setState", input);
   return ctkDicomSoapBool::getBool(result);
 }
 
+//----------------------------------------------------------------------------
 bool ctkDicomAppService::bringToFront(const QRect& requestedScreenArea)
 {
-  //Q_D(ctkDicomService);
   QtSoapType* input = new ctkDicomSoapRectangle("requestedScreenArea", requestedScreenArea);
-  const QtSoapType & result = d->askHost("bringToFront", input);
+  const QtSoapType & result = submitSoapRequest("bringToFront", input);
   return ctkDicomSoapBool::getBool(result);
 }
 
+//----------------------------------------------------------------------------
 // Exchange methods
 
-bool ctkDicomAppService::notifyDataAvailable(ctkDicomAppHosting::AvailableData data, bool lastData)
+//----------------------------------------------------------------------------
+bool ctkDicomAppService::notifyDataAvailable(const ctkDicomAppHosting::AvailableData& data, bool lastData)
 {
-  return service.notifyDataAvailable(data, lastData);
+  return ctkDicomExchangeService::notifyDataAvailable(data, lastData);
 }
 
+//----------------------------------------------------------------------------
 QList<ctkDicomAppHosting::ObjectLocator> ctkDicomAppService::getData(
-  QList<QUuid> objectUUIDs, 
-  QList<QString> acceptableTransferSyntaxUIDs, 
+  const QList<QUuid>& objectUUIDs,
+  const QList<QString>& acceptableTransferSyntaxUIDs,
   bool includeBulkData)
 {
-  return service.getData(objectUUIDs, acceptableTransferSyntaxUIDs, includeBulkData);
+  return ctkDicomExchangeService::getData(objectUUIDs, acceptableTransferSyntaxUIDs, includeBulkData);
 }
 
-void ctkDicomAppService::releaseData(QList<QUuid> objectUUIDs)
+//----------------------------------------------------------------------------
+void ctkDicomAppService::releaseData(const QList<QUuid>& objectUUIDs)
 {
-  service.releaseData(objectUUIDs);
+  ctkDicomExchangeService::releaseData(objectUUIDs);
 }

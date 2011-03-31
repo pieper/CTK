@@ -30,6 +30,7 @@
 #include <QTest>
 #include <QDebug>
 
+//----------------------------------------------------------------------------
 ctkConfigurationAdminTestSuite::ctkConfigurationAdminTestSuite(
   ctkPluginContext* pc, long cmPluginId)
   : context(pc), cmPluginId(cmPluginId), cm(0)
@@ -37,6 +38,7 @@ ctkConfigurationAdminTestSuite::ctkConfigurationAdminTestSuite(
 
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::init()
 {
   context->getPlugin(cmPluginId)->start();
@@ -44,50 +46,56 @@ void ctkConfigurationAdminTestSuite::init()
   cm = context->getService<ctkConfigurationAdmin>(reference);
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::cleanup()
 {
   context->ungetService(reference);
   context->getPlugin(cmPluginId)->stop();
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateConfig()
 {
   ctkConfigurationPtr config = cm->getConfiguration("test");
   QCOMPARE(QString("test"), config->getPid());
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateConfigNullPid()
 {
   try
   {
     cm->getConfiguration(QString());
   }
-  catch (const std::invalid_argument& e)
+  catch (const std::invalid_argument& )
   {
     return;
   }
   QFAIL("no exception thrown");
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateConfigWithLocation()
 {
   ctkConfigurationPtr config = cm->getConfiguration("test", QString());
   QCOMPARE(QString("test"), config->getPid());
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateConfigNullPidWithLocation()
 {
   try
   {
     cm->getConfiguration(QString(), QString());
   }
-  catch (const std::invalid_argument& e)
+  catch (const std::invalid_argument& )
   {
     return;
   }
   QFAIL("no exception thrown");
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateConfigWithAndWithoutLocation()
 {
   ctkConfigurationPtr config = cm->getConfiguration("test", "x");
@@ -97,6 +105,7 @@ void ctkConfigurationAdminTestSuite::testCreateConfigWithAndWithoutLocation()
   config->remove();
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateConfigWithAndWithoutNullLocation()
 {
   ctkConfigurationPtr config = cm->getConfiguration("test", QString());
@@ -108,44 +117,49 @@ void ctkConfigurationAdminTestSuite::testCreateConfigWithAndWithoutNullLocation(
   config->remove();
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateFactoryConfig()
 {
   ctkConfigurationPtr config = cm->createFactoryConfiguration("test");
   QCOMPARE(QString("test"), config->getFactoryPid());
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateFactoryConfigNullPid()
 {
   try
   {
     cm->createFactoryConfiguration(QString());
   }
-  catch (const std::invalid_argument& e)
+  catch (const std::invalid_argument& )
   {
     return;
   }
   QFAIL("no exception thrown");
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateFactoryConfigWithLocation()
 {
   ctkConfigurationPtr config = cm->createFactoryConfiguration("test", QString());
   QCOMPARE(QString("test"), config->getFactoryPid());
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateFactoryConfigNullPidWithLocation()
 {
   try
   {
     cm->createFactoryConfiguration(QString(), QString());
   }
-  catch (const std::invalid_argument& e)
+  catch (const std::invalid_argument& )
   {
     return;
   }
   QFAIL("no exception thrown");
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateFactoryConfigWithAndWithoutLocation()
 {
   ctkConfigurationPtr config = cm->createFactoryConfiguration("test", "x");
@@ -155,6 +169,7 @@ void ctkConfigurationAdminTestSuite::testCreateFactoryConfigWithAndWithoutLocati
   config->remove();
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testCreateFactoryConfigWithAndWithoutNullLocation()
 {
   ctkConfigurationPtr config = cm->createFactoryConfiguration("test", QString());
@@ -166,6 +181,7 @@ void ctkConfigurationAdminTestSuite::testCreateFactoryConfigWithAndWithoutNullLo
   config->remove();
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testListConfiguration()
 {
   ctkConfigurationPtr config = cm->getConfiguration("test", QString());
@@ -181,6 +197,7 @@ void ctkConfigurationAdminTestSuite::testListConfiguration()
   config->remove();
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testListConfigurationWithBoundLocation()
 {
   ctkConfigurationPtr config = cm->getConfiguration("test", QString());
@@ -201,6 +218,7 @@ void ctkConfigurationAdminTestSuite::testListConfigurationWithBoundLocation()
   config->remove();
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testListFactoryConfiguration()
 {
   ctkConfigurationPtr config = cm->createFactoryConfiguration("test", QString());
@@ -216,6 +234,7 @@ void ctkConfigurationAdminTestSuite::testListFactoryConfiguration()
   config->remove();
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testListFactoryConfigurationWithBoundLocation()
 {
   ctkConfigurationPtr config = cm->createFactoryConfiguration("test", QString());
@@ -237,6 +256,7 @@ void ctkConfigurationAdminTestSuite::testListFactoryConfigurationWithBoundLocati
   config->remove();
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testListConfigurationNull()
 {
   ctkConfigurationPtr config = cm->createFactoryConfiguration("test", QString());
@@ -251,6 +271,7 @@ void ctkConfigurationAdminTestSuite::testListConfigurationNull()
   config->remove();
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testPersistentConfig()
 {
   ctkConfigurationPtr config = cm->getConfiguration("test");
@@ -271,6 +292,7 @@ void ctkConfigurationAdminTestSuite::testPersistentConfig()
   QVERIFY(config->getProperties().isEmpty());
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigurationAdminTestSuite::testPersistentFactoryConfig()
 {
   ctkConfigurationPtr config = cm->createFactoryConfiguration("test");

@@ -26,21 +26,23 @@
 
 #include "ctkPluginFrameworkExport.h"
 
-
+/**
+ * \ingroup PluginFramework
+ */
 struct CTK_PLUGINFW_EXPORT ctkPluginConstants {
 
   /**
    * Location identifier of the CTK <i>system plugin</i>, which is defined
    * to be &quot;System Plugin&quot;.
    */
-  static const QString	SYSTEM_PLUGIN_LOCATION; // = "System Plugin"
+  static const QString SYSTEM_PLUGIN_LOCATION; // = "System Plugin"
 
   /**
    * Alias for the symbolic name of the CTK <i>system plugin</i>. It is
    * defined to be &quot;system.plugin&quot;.
    *
    */
-  static const QString	SYSTEM_PLUGIN_SYMBOLICNAME; // = "system.plugin"
+  static const QString SYSTEM_PLUGIN_SYMBOLICNAME; // = "system.plugin"
 
 
   /**
@@ -134,14 +136,14 @@ struct CTK_PLUGINFW_EXPORT ctkPluginConstants {
    *
    * <p>
    * The attribute value may be retrieved from the <code>QHash</code>
-   * object returned by the <code>Plugin::getHeaders</code> method.
+   * object returned by the <code>ctkPlugin::getHeaders</code> method.
    *
    * @see #PLUGIN_LOCALIZATION_DEFAULT_BASENAME
    */
   static const QString PLUGIN_LOCALIZATION; // = "Plugin-Localization"
 
   /**
-   * Default value for the <code>ctkPlugin-Localization</code> manifest header.
+   * Default value for the <code>Plugin-Localization</code> manifest header.
    *
    * @see #PLUGIN_LOCALIZATION
    */
@@ -190,7 +192,7 @@ struct CTK_PLUGINFW_EXPORT ctkPluginConstants {
    * The attribute value may be retrieved from the <code>QHash</code>
    * object returned by the <code>ctkPlugin::getHeaders()</code> method.
    */
-  static const QString	PLUGIN_VERSION; // = "Plugin-Version"
+  static const QString PLUGIN_VERSION; // = "Plugin-Version"
 
   /**
    * Manifest header identifying the plugin's activation policy.
@@ -200,16 +202,11 @@ struct CTK_PLUGINFW_EXPORT ctkPluginConstants {
    *
    * @see #ACTIVATION_EAGER
    */
-  static const QString	PLUGIN_ACTIVATIONPOLICY; // = "Plugin-ActivationPolicy"
+  static const QString PLUGIN_ACTIVATIONPOLICY; // = "Plugin-ActivationPolicy"
 
   /**
-   * Plugin activation policy declaring the plugin must be activated when the
-   * first object is instantiated from the plugin.
-   * <p>
-   * A plugin with the lazy (default) activation policy
-   * will wait in the ctkPlugin#STARTING state until the first
-   * class instantiation from the plugin occurs. The plugin will then be activated
-   * before the instance is returned to the requester.
+   * Plugin activation policy declaring the plugin must be activated immediately.
+   *
    * <p>
    * A plugin with the eager activation policy that is started with the
    * ctkPlugin#START_ACTIVATION_POLICY option will be activating immediately when
@@ -226,7 +223,25 @@ struct CTK_PLUGINFW_EXPORT ctkPluginConstants {
    * @see ctkPlugin#start(int)
    * @see ctkPlugin#START_ACTIVATION_POLICY
    */
-  static const QString	ACTIVATION_EAGER; // = "eager"
+  static const QString ACTIVATION_EAGER; // = "eager"
+
+  /**
+   * Plugin activation policy declaring the plugin must be activated when the
+   * first object is instantiated from the plugin.
+   * <p>
+   * A plugin with the lazy activation policy that is started with the
+   * {@link ctkPlugin#START_ACTIVATION_POLICY START_ACTIVATION_POLICY} option
+   * will wait in the ctkPlugin#STARTING state until the first
+   * class instantiation from the plugin occurs. The plugin will then be activated
+   * before the instance is returned to the requester.
+   * <p>
+   * The lazy activation policy is the default for every plugin.
+   *
+   * @see #PLUGIN_ACTIVATIONPOLICY
+   * @see ctkPlugin#start(int)
+   * @see ctkPlugin#START_ACTIVATION_POLICY
+   */
+  static const QString ACTIVATION_LAZY; // = "lazy"
 
   /**
    * Manifest header directive identifying the resolution type in the
@@ -305,7 +320,8 @@ struct CTK_PLUGINFW_EXPORT ctkPluginConstants {
    * previously assigned values since the Framework was started. These values
    * are NOT persistent across restarts of the Framework.
    */
-  static const QString SERVICE_ID; //	= "service.id"
+  // ATTENTION!!! If the value is changed, change also ctkEventConstants::SERVICE_ID
+  static const QString SERVICE_ID; // = "service.id"
 
   /**
    * Service property identifying a service's persistent identifier.
@@ -322,10 +338,11 @@ struct CTK_PLUGINFW_EXPORT ctkPluginConstants {
    *
    * <p>
    * By convention, every plugin has its own unique namespace, starting with
-   * the plugin's identifier (see {@link ctkPlugin#getPluginId}) and followed by
+   * the plugin's identifier (see ctkPlugin::getPluginId) and followed by
    * a dot (.). A plugin may use this as the prefix of the persistent
    * identifiers for the services it registers.
    */
+  // ATTENTION!!! If the value is changed, change also ctkEventConstants::SERVICE_PID
   static const QString SERVICE_PID; // = "service.pid"
 
   /**
@@ -333,13 +350,13 @@ struct CTK_PLUGINFW_EXPORT ctkPluginConstants {
    *
    * <p>
    * This property may be supplied in the
-   * <code>ServiceProperties</code> object passed to the
+   * <code>ctkDictionary</code> object passed to the
    * <code>ctkPluginContext::registerService</code> method. The value of this
    * property must be of type <code>int</code>.
    *
    * <p>
    * The service ranking is used by the Framework to determine the <i>natural
-   * order</i> of services, see {@link ctkServiceReference::operator<(const ctkServiceReference&)},
+   * order</i> of services, see ctkServiceReference::operator<(const ctkServiceReference&),
    * and the <i>default</i> service to be returned from a call to the
    * {@link ctkPluginContext::getServiceReference} method.
    *
@@ -354,6 +371,24 @@ struct CTK_PLUGINFW_EXPORT ctkPluginConstants {
    * deemed to have a ranking value of zero.
    */
   static const QString SERVICE_RANKING; // = "service.ranking"
+
+  /**
+   * Service property identifying a service's vendor.
+   *
+   * <p>
+   * This property may be supplied in the properties <code>ctkDictionary</code> object
+   * passed to the <code>ctkPluginContext::registerService()</code> method.
+   */
+  static const QString SERVICE_VENDOR; // = "service.vendor"
+
+  /**
+   * Service property identifying a service's description.
+   *
+   * <p>
+   * This property may be supplied in the properties <code>ctkDictionary</code> object
+   * passed to the <code>ctkPluginContext::registerService()</code> method.
+   */
+  static const QString SERVICE_DESCRIPTION; // = "service.description"
 
 };
 

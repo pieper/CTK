@@ -108,6 +108,11 @@ ctkMacroGetAllNonCTKTargetLibraries("${ALL_TARGET_LIBRARIES}" NON_CTK_DEPENDENCI
 #
 
 #-----------------------------------------------------------------------------
+# Attempt to discover Doxygen so that DOXYGEN_EXECUTABLE is set to an appropriate default value
+#
+FIND_PACKAGE(Doxygen QUIET)
+
+#-----------------------------------------------------------------------------
 # ExternalProjects - Project should be topologically ordered
 #
 SET(external_projects
@@ -123,6 +128,7 @@ SET(external_projects
   QtSOAP
   OpenIGTLink
   XIP
+  ITK
   )
 
 # Include external projects
@@ -130,14 +136,17 @@ SET(dependency_args )
 FOREACH(p ${external_projects})
   INCLUDE(CMakeExternals/${p}.cmake)
   IF(${p}_enabling_variable)
-    # Provide the include directories either directly or provide the variable name
+    # Provides the include and library directories either directly or provides the variable name
     # used by the corresponding Find<package>.cmake files. 
     # The top-level CMakeLists.txt file will expand the variable names if not in
-    # superbuild mode. The include dirs are then used in 
+    # superbuild mode. The include and library dirs are then used in 
     # ctkMacroBuildApp, ctkMacroBuildLib, and ctkMacroBuildPlugin
     STRING(REPLACE ";" "^" _include_dirs "${${${p}_enabling_variable}_INCLUDE_DIRS}")
     LIST(APPEND dependency_args 
          -D${${p}_enabling_variable}_INCLUDE_DIRS:STRING=${_include_dirs})
+    STRING(REPLACE ";" "^" _library_dirs "${${${p}_enabling_variable}_LIBRARY_DIRS}")
+    LIST(APPEND dependency_args 
+         -D${${p}_enabling_variable}_LIBRARY_DIRS:STRING=${_library_dirs})
     IF(${${p}_enabling_variable}_FIND_PACKAGE_CMD)
       LIST(APPEND dependency_args
            -D${${p}_enabling_variable}_FIND_PACKAGE_CMD:STRING=${${${p}_enabling_variable}_FIND_PACKAGE_CMD})
@@ -170,7 +179,8 @@ ExternalProject_Add(${proj}
     ${ZMQ_DEPENDS}
     ${OpenIGTLink_DEPENDS}
     ${VTK_DEPENDS}
-    ${XIP_DEPENDS}    
+    ${XIP_DEPENDS}
+    ${ITK_DEPENDS}
 )
 
 #-----------------------------------------------------------------------------
@@ -231,6 +241,7 @@ ExternalProject_Add(${proj}
     ${ctk_superbuild_boolean_args}
     -DCTK_SUPERBUILD:BOOL=OFF
     -DDOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY:PATH=${DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY}
+    -DDOXYGEN_EXECUTABLE:FILEPATH=${DOXYGEN_EXECUTABLE}
     -DCTK_SUPERBUILD_BINARY_DIR:PATH=${CTK_BINARY_DIR}
     -DCTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY:PATH=${CTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
     -DCTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}
@@ -260,6 +271,7 @@ ExternalProject_Add(${proj}
     -DLog4Qt_DIR:PATH=${Log4Qt_DIR} # FindLog4Qt expects Log4Qt_DIR variable to be defined
     -DQtSOAP_DIR:PATH=${QtSOAP_DIR} # FindQtSOAP expects QtSOAP_DIR variable to be defined
     -DQtMobility_DIR:PATH=${QtMobility_DIR}
+    -DITK_DIR:PATH=${ITK_DIR} # FindITK expects ITK_DIR variable to be defined
     ${dependency_args}
   SOURCE_DIR ${CTK_SOURCE_DIR}
   BINARY_DIR ${CTK_BINARY_DIR}/CTK-build

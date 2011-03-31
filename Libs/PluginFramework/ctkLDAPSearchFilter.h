@@ -25,7 +25,7 @@
 #include "ctkPluginFrameworkExport.h"
 
 #include "ctkServiceReference.h"
-#include "ctkPluginFramework_global.h"
+#include "ctkDictionary.h"
 
 #include <QSharedDataPointer>
 #include <QDebug>
@@ -33,11 +33,13 @@
 class ctkLDAPSearchFilterData;
 
 /**
+ * \ingroup PluginFramework
+ *
  * An <a href="http://www.ietf.org/rfc/rfc1960.txt">RFC 1960</a>-based Filter.
  *
  * <p>
- * A {@code ctkLDAPSearchFilter} can be used numerous times to determine if the match
- * argument matches the filter string that was used to create the {@code ctkLDAPSearchFilter}.
+ * A <code>ctkLDAPSearchFilter</code> can be used numerous times to determine if the match
+ * argument matches the filter string that was used to create the <code>ctkLDAPSearchFilter</code>.
  * <p>
  * Some examples of LDAP filters are:
  *
@@ -49,12 +51,20 @@ class ctkLDAPSearchFilterData;
  * \endverbatim
  *
  * \see "CTK Wiki for a description of the filter string syntax." TODO!
- * \threadsafe
+ * \remarks This class is thread safe.
  */
 class CTK_PLUGINFW_EXPORT ctkLDAPSearchFilter {
 
 public:
 
+  /**
+   * Creates in invalid <code>ctkLDAPSearchFilter</code> object.
+   * Test the validity by using the boolean conversion operator.
+   *
+   * <p>
+   * Calling methods on an invalid <code>ctkLDAPSearchFilter</code>
+   * will result in undefined behavior.
+   */
   ctkLDAPSearchFilter();
 
   /**
@@ -78,10 +88,12 @@ public:
 
   ~ctkLDAPSearchFilter();
 
+  operator bool() const;
+
   /**
    * Filter using a service's properties.
    * <p>
-   * This {@code ctkLDAPSearchFilter} is executed using the keys and values of the
+   * This <code>ctkLDAPSearchFilter</code> is executed using the keys and values of the
    * referenced service's properties. The keys are looked up in a case
    * insensitive manner.
    *
@@ -147,6 +159,9 @@ protected:
 
 };
 
+/**
+ * \ingroup PluginFramework
+ */
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug dbg, const ctkLDAPSearchFilter& filter);
 
 #endif // CTKLDAPSEARCHFILTER_H

@@ -24,6 +24,7 @@
 
 #include <QSharedDataPointer>
 #include <QSharedPointer>
+#include <QMetaType>
 
 #include "ctkPluginFrameworkExport.h"
 
@@ -32,6 +33,8 @@ class ctkPlugin;
 class ctkPluginEventData;
 
 /**
+ * \ingroup PluginFramework
+ *
  * An event from the Framework describing a plugin lifecycle change.
  * <p>
  * <code>ctkPluginEvent</code> objects are delivered to slots connected
@@ -135,7 +138,7 @@ public:
     /**
      * The plugin will be lazily activated.
      * <p>
-     * The plugin has a \link ctkPluginConstant::ACTIVATION_LAZY lazy activation policy\endlink
+     * The plugin has a \link ctkPluginConstants::ACTIVATION_LAZY lazy activation policy\endlink
      * and is waiting to be activated. It is now in the
      * \link ctkPlugin::STARTING STARTING\endlink state and has a valid
      * <code>ctkPluginContext</code>. This
@@ -201,7 +204,14 @@ public:
 
 };
 
+Q_DECLARE_METATYPE(ctkPluginEvent)
+
+/**
+ * \ingroup PluginFramework
+ * @{
+ */
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug debug, ctkPluginEvent::Type eventType);
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug debug, const ctkPluginEvent& event);
+/** @}*/
 
 #endif // CTKPLUGINEVENT_H

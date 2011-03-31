@@ -23,27 +23,29 @@
 #ifndef CTKDICOMEXCHANGESERVICE_H
 #define CTKDICOMEXCHANGESERVICE_H
 
-#include <ctkDicomExchangeInterface.h>
-#include <QScopedPointer>
+#include "ctkSimpleSoapClient.h"
+#include "ctkDicomExchangeInterface.h"
+
 #include <org_commontk_dah_core_Export.h>
 
-class ctkDicomServicePrivate;
-
-class org_commontk_dah_core_EXPORT ctkDicomExchangeService : public ctkDicomExchangeInterface
+class org_commontk_dah_core_EXPORT ctkDicomExchangeService :
+    public ctkSimpleSoapClient, public ctkDicomExchangeInterface
 {
 
 public:
+
   ctkDicomExchangeService(ushort port, QString path);
-  ~ctkDicomExchangeService();
+  virtual ~ctkDicomExchangeService();
 
-  bool notifyDataAvailable(ctkDicomAppHosting::AvailableData data, bool lastData);
-  QList<ctkDicomAppHosting::ObjectLocator> getData(QList<QUuid> objectUUIDs,
-                                             QList<QString> acceptableTransferSyntaxUIDs, bool includeBulkData);
-  void releaseData(QList<QUuid> objectUUIDs);
+  bool notifyDataAvailable(const ctkDicomAppHosting::AvailableData& data, bool lastData);
 
+  QList<ctkDicomAppHosting::ObjectLocator> getData(
+    const QList<QUuid>& objectUUIDs,
+    const QList<QString>& acceptableTransferSyntaxUIDs,
+    bool includeBulkData);
 
-protected:
-  ctkDicomServicePrivate * d;
+  void releaseData(const QList<QUuid>& objectUUIDs);
+
 };
 
 #endif // CTKDICOMEXCHANGESERVICE_H

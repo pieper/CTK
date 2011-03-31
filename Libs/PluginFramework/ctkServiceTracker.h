@@ -36,6 +36,8 @@ template<class S, class T> class ctkServiceTrackerPrivate;
 class ctkPluginContext;
 
 /**
+ * \ingroup PluginFramework
+ *
  * The <code>ctkServiceTracker</code> class simplifies using services from the
  * Framework's service registry.
  * <p>
@@ -66,7 +68,7 @@ class ctkPluginContext;
  * \tparam T The type of the tracked object. The type must be an assignable
  *         datatype, provide a boolean conversion function, and provide
  *         a constructor and an assignment operator which can handle 0 as an argument.
- * \threadsafe
+ * \remarks This class is thread safe.
  */
 template<class S = QObject*, class T = S>
 class ctkServiceTracker : protected ctkServiceTrackerCustomizer<T>
@@ -319,6 +321,28 @@ public:
    */
   virtual int getTrackingCount() const;
 
+  /**
+   * Return a sorted <code>QMap</code> of the <code>ctkServiceReference</code>s and
+   * service objects for all services being tracked by this
+   * <code>ctkServiceTracker</code>. The map is sorted in natural order
+   * of <code>ctkServiceReference</code>. That is, the last entry is the service
+   * with the highest ranking and the lowest service id.
+   *
+   * @return A <code>QMap</code> with the <code>ctkServiceReference</code>s
+   *         and service objects for all services being tracked by this
+   *         <code>ctkServiceTracker</code>. If no services are being tracked,
+   *         then the returned map is empty.
+   */
+  virtual QMap<ctkServiceReference, T> getTracked() const;
+
+  /**
+   * Return if this <code>ctkServiceTracker</code> is empty.
+   *
+   * @return <code>true</code> if this <code>ctkServiceTracker</code> is not tracking any
+   *         services.
+   */
+  virtual bool isEmpty() const;
+
 protected:
 
   /**
@@ -338,7 +362,7 @@ protected:
    * This method can be overridden in a subclass to customize the service
    * object to be tracked for the service being added. In that case, take care
    * not to rely on the default implementation of
-   * \link removedService(const ctkServiceReference&, QObject*) removedService\endlink
+   * \link removedService(const ctkServiceReference&, T service) removedService\endlink
    * to unget the service.
    *
    * @param reference The reference to the service being added to this

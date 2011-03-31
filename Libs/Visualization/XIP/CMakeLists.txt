@@ -1,15 +1,6 @@
 PROJECT(CTKVisualizationXIP)
 
 #
-# 3rd party dependencies
-#
-
-# FIND_PACKAGE(XIP)
-# IF(NOT XIP_FOUND)
-#   MESSAGE(FATAL_ERROR "error: XIP package is required to build ${PROJECT_NAME}")
-# ENDIF()
-
-#
 # See CTK/CMake/ctkMacroBuildLib.cmake for details
 #
 
@@ -35,9 +26,9 @@ SET(KIT_UI_FORMS
 SET(KIT_resources
 )
 
-# Target libraries - See CMake/ctkMacroGetTargetLibraries.cmake
+# Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
-ctkMacroGetTargetLibraries(KIT_target_libraries)
+ctkFunctionGetTargetLibraries(KIT_target_libraries)
 
 ctkMacroBuildLib(
   NAME ${PROJECT_NAME}

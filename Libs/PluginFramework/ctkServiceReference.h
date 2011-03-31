@@ -23,6 +23,7 @@
 #define CTKSERVICEREFERENCE_H
 
 #include <QVariant>
+#include <QMetaType>
 
 #include "ctkPlugin.h"
 
@@ -34,6 +35,8 @@ class ctkServiceReferencePrivate;
 class ctkServiceEvent;
 
 /**
+ * \ingroup PluginFramework
+ *
  * A reference to a service.
  *
  * <p>
@@ -60,7 +63,7 @@ class ctkServiceEvent;
  * @see ctkPluginContext::getServiceReference
  * @see ctkPluginContext::getServiceReferences
  * @see ctkPluginContext::getService
- * @threadsafe
+ * @remarks This class is thread safe.
  */
 class CTK_PLUGINFW_EXPORT ctkServiceReference {
 
@@ -85,11 +88,17 @@ public:
    */
   operator bool() const;
 
+  /**
+   * Releases any resources held or locked by this
+   * <code>ctkServiceReference</code> and renders it invalid.
+   */
+  ctkServiceReference& operator=(int null);
+
   ~ctkServiceReference();
 
   /**
    * Returns the property value to which the specified property key is mapped
-   * in the properties <code>ServiceProperties</code> object of the service
+   * in the properties <code>ctkDictionary</code> object of the service
    * referenced by this <code>ctkServiceReference</code> object.
    *
    * <p>
@@ -107,7 +116,7 @@ public:
   QVariant getProperty(const QString& key) const;
 
   /**
-   * Returns a list of the keys in the <code>ServiceProperties</code>
+   * Returns a list of the keys in the <code>ctkDictionary</code>
    * object of the service referenced by this <code>ctkServiceReference</code>
    * object.
    *
@@ -119,8 +128,8 @@ public:
    * <p>
    * This method is not <i>case-preserving</i>; this means that every key in the
    * returned array is in lower case, which may not be the case for the corresponding key in the
-   * properties <code>ServiceProperties</code> that was passed to the
-   * {@link ctkPluginContext::registerService(const QStringList&, QObject*, const ServiceProperties&)} or
+   * properties <code>ctkDictionary</code> that was passed to the
+   * {@link ctkPluginContext::registerService(const QStringList&, QObject*, const ctkDictionary&)} or
    * {@link ctkServiceRegistration::setProperties} methods.
    *
    * @return A list of property keys.
@@ -139,7 +148,7 @@ public:
    * @return The plugin that registered the service referenced by this
    *         <code>ctkServiceReference</code> object; <code>0</code> if that
    *         service has already been unregistered.
-   * @see ctkPluginContext::registerService(const QStringList&, QObject* , const ServiceProperties&)
+   * @see ctkPluginContext::registerService(const QStringList&, QObject* , const ctkDictionary&)
    */
   QSharedPointer<ctkPlugin> getPlugin() const;
 
@@ -206,8 +215,15 @@ protected:
 
 };
 
+/**
+ * \ingroup PluginFramework
+ * @{
+ */
 uint CTK_PLUGINFW_EXPORT qHash(const ctkServiceReference& serviceRef);
 QDebug CTK_PLUGINFW_EXPORT operator<<(QDebug dbg, const ctkServiceReference& serviceRef);
+/** @}*/
+
+Q_DECLARE_METATYPE(ctkServiceReference)
 
 
 #endif // CTKSERVICEREFERENCE_H

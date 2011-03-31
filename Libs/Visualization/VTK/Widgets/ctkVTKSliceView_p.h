@@ -28,36 +28,28 @@
 #include <QSharedPointer>
 
 // CTK includes
-#include <ctkPimpl.h>
-#include <ctkVTKObject.h>
-#include <vtkLightBoxRendererManager.h>
 #include "ctkVTKSliceView.h"
+#include "ctkVTKAbstractView_p.h"
+#include <vtkLightBoxRendererManager.h>
 
 // VTK includes
-#include <QVTKWidget.h>
 #include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
 #include <vtkSmartPointer.h>
-#include <vtkWeakPointer.h>
-#include <vtkImageMapper.h>
 #include <vtkCornerAnnotation.h>
 
 class vtkRenderWindowInteractor;
 
 //-----------------------------------------------------------------------------
-class ctkVTKSliceViewPrivate : public QObject
+class ctkVTKSliceViewPrivate : public ctkVTKAbstractViewPrivate
 {
   Q_OBJECT
 public:
-  ctkVTKSliceViewPrivate();
+  ctkVTKSliceViewPrivate(ctkVTKSliceView&);
 
   /// Convenient setup methods
   void setupCornerAnnotation();
   void setupRendering();
-  void setupDefaultInteractor();
 
-  QVTKWidget*                                   VTKWidget;
-  vtkSmartPointer<vtkRenderWindow>              RenderWindow;
   vtkSmartPointer<vtkLightBoxRendererManager>   LightBoxRendererManager;
   bool                                          RenderPending;
   bool                                          RenderEnabled;

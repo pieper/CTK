@@ -22,7 +22,7 @@
 #ifndef CTKSERVICEREGISTRATION_H
 #define CTKSERVICEREGISTRATION_H
 
-#include "ctkPluginFramework_global.h"
+#include "ctkDictionary.h"
 #include "ctkServiceReference.h"
 
 #include "ctkPluginFrameworkExport.h"
@@ -31,6 +31,8 @@
 class ctkServiceRegistrationPrivate;
 
 /**
+ * \ingroup PluginFramework
+ *
  * A registered service.
  *
  * <p>
@@ -43,7 +45,7 @@ class ctkServiceRegistrationPrivate;
  * properties of the service or to unregister the service.
  *
  * @see ctkPluginContext#registerService()
- * @threadsafe
+ * @remarks This class is thread safe.
  */
 class CTK_PLUGINFW_EXPORT ctkServiceRegistration {
 
@@ -61,6 +63,12 @@ public:
   ctkServiceRegistration(const ctkServiceRegistration& reg);
 
   operator bool() const;
+
+  /**
+   * Releases any resources held or locked by this
+   * <code>ctkServiceRegistration</code> and renders it invalid.
+   */
+  ctkServiceRegistration& operator=(int null);
 
   ~ctkServiceRegistration();
 
@@ -90,7 +98,7 @@ public:
    * The following steps are required to modify service properties:
    * <ol>
    * <li>The service's properties are replaced with the provided properties.
-   * <li>A service event of type {@link ServiceEvent#MODIFIED} is fired.
+   * <li>A service event of type {@link ctkServiceEvent#MODIFIED} is fired.
    * </ol>
    *
    * @param properties The properties for this service. See {@link ctkPluginConstants}
@@ -103,7 +111,7 @@ public:
    * @throws std::invalid_argument If <code>properties</code> contains
    *         case variants of the same key name.
    */
-  void setProperties(const ServiceProperties& properties);
+  void setProperties(const ctkDictionary& properties);
 
   /**
    * Unregisters a service. Remove a <code>ctkServiceRegistration</code> object
@@ -117,7 +125,7 @@ public:
    * <ol>
    * <li>The service is removed from the Framework service registry so that
    * it can no longer be obtained.
-   * <li>A service event of type {@link ServiceEvent#UNREGISTERING} is fired
+   * <li>A service event of type {@link ctkServiceEvent#UNREGISTERING} is fired
    * so that plugins using this service can release their use of the service.
    * Once delivery of the service event is complete, the
    * <code>ctkServiceReference</code> objects for the service may no longer be
@@ -155,12 +163,15 @@ protected:
   ctkServiceRegistration(ctkServiceRegistrationPrivate* registrationPrivate);
 
   ctkServiceRegistration(ctkPluginPrivate* plugin, QObject* service,
-                         const ServiceProperties& props);
+                         const ctkDictionary& props);
 
   ctkServiceRegistrationPrivate* d_ptr;
 
 };
 
+/**
+ * \ingroup PluginFramework
+ */
 uint CTK_PLUGINFW_EXPORT qHash(const ctkServiceRegistration& serviceRef);
 
 #endif // CTKSERVICEREGISTRATION_H

@@ -32,13 +32,14 @@
 
 #include <QUrl>
 
-
+//----------------------------------------------------------------------------
 ctkPlugins::ctkPlugins(ctkPluginFrameworkContext* fw)
 {
   fwCtx = fw;
   plugins.insert(fw->systemPlugin->getLocation(), fw->systemPlugin);
 }
 
+//----------------------------------------------------------------------------
 void ctkPlugins::clear()
 {
   QWriteLocker lock(&pluginsLock);
@@ -46,6 +47,7 @@ void ctkPlugins::clear()
   fwCtx = 0;
 }
 
+//----------------------------------------------------------------------------
 QSharedPointer<ctkPlugin> ctkPlugins::install(const QUrl& location, QIODevice* in)
 {
   if (!fwCtx)
@@ -138,12 +140,14 @@ QSharedPointer<ctkPlugin> ctkPlugins::install(const QUrl& location, QIODevice* i
 
 }
 
+//----------------------------------------------------------------------------
 void ctkPlugins::remove(const QUrl& location)
 {
   QWriteLocker lock(&pluginsLock);
   plugins.remove(location.toString());
 }
 
+//----------------------------------------------------------------------------
 QSharedPointer<ctkPlugin> ctkPlugins::getPlugin(int id) const
 {
   if (!fwCtx)
@@ -167,7 +171,8 @@ QSharedPointer<ctkPlugin> ctkPlugins::getPlugin(int id) const
   return QSharedPointer<ctkPlugin>();
 }
 
-ctkPlugin* ctkPlugins::getPlugin(const QString& location) const
+//----------------------------------------------------------------------------
+QSharedPointer<ctkPlugin> ctkPlugins::getPlugin(const QString& location) const
 {
   if (!fwCtx)
   { // This plugins instance has been closed!
@@ -176,11 +181,12 @@ ctkPlugin* ctkPlugins::getPlugin(const QString& location) const
 
   QReadLocker lock(&pluginsLock);
   QHash<QString, QSharedPointer<ctkPlugin> >::const_iterator it = plugins.find(location);
-  if (it != plugins.end()) return it.value().data();
-  return 0;
+  if (it != plugins.end()) return it.value();
+  return QSharedPointer<ctkPlugin>(0);
 }
 
-ctkPlugin* ctkPlugins::getPlugin(const QString& name, const ctkVersion& version) const
+//----------------------------------------------------------------------------
+QSharedPointer<ctkPlugin> ctkPlugins::getPlugin(const QString& name, const ctkVersion& version) const
 {
   if (!fwCtx)
   { // This ctkPlugins instance has been closed!
@@ -196,13 +202,14 @@ ctkPlugin* ctkPlugins::getPlugin(const QString& name, const ctkVersion& version)
       QSharedPointer<ctkPlugin> plugin = it.next().value();
       if ((name == plugin->getSymbolicName()) && (version == plugin->getVersion()))
       {
-        return plugin.data();
+        return plugin;
       }
     }
   }
-  return 0;
+  return QSharedPointer<ctkPlugin>(0);
 }
 
+//----------------------------------------------------------------------------
 QList<QSharedPointer<ctkPlugin> > ctkPlugins::getPlugins() const
 {
   if (!fwCtx)
@@ -216,6 +223,7 @@ QList<QSharedPointer<ctkPlugin> > ctkPlugins::getPlugins() const
   }
 }
 
+//----------------------------------------------------------------------------
 QList<ctkPlugin*> ctkPlugins::getPlugins(const QString& name) const
 {
   QList<ctkPlugin*> res;
@@ -236,6 +244,7 @@ QList<ctkPlugin*> ctkPlugins::getPlugins(const QString& name) const
   return res;
 }
 
+//----------------------------------------------------------------------------
 QList<ctkPlugin*> ctkPlugins::getPlugins(const QString& name, const ctkVersionRange& range) const
 {
   if (!fwCtx)
@@ -266,6 +275,7 @@ QList<ctkPlugin*> ctkPlugins::getPlugins(const QString& name, const ctkVersionRa
   return res;
 }
 
+//----------------------------------------------------------------------------
 QList<ctkPlugin*> ctkPlugins::getActivePlugins() const
 {
   if (!fwCtx)
@@ -289,6 +299,7 @@ QList<ctkPlugin*> ctkPlugins::getActivePlugins() const
   return slist;
 }
 
+//----------------------------------------------------------------------------
 void ctkPlugins::load()
 {
   QList<ctkPluginArchive*> pas = fwCtx->storage->getAllPluginArchives();
@@ -320,6 +331,7 @@ void ctkPlugins::load()
   }
 }
 
+//----------------------------------------------------------------------------
 void ctkPlugins::startPlugins(const QList<ctkPlugin*>& slist) const
 {
   // Sort in start order
@@ -345,7 +357,7 @@ void ctkPlugins::startPlugins(const QList<ctkPlugin*>& slist) const
       }
       catch (const ctkPluginException& pe)
       {
-        pp->fwCtx->listeners.frameworkError(plugin, pe);
+        pp->fwCtx->listeners.frameworkError(pp->q_func(), pe);
       }
     }
   }

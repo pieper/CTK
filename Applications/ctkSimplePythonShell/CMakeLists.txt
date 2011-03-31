@@ -58,9 +58,9 @@ SET(VTK_LIBRARIES
   vtkFiltering
   )
 
-# Target libraries - See CMake/ctkMacroGetTargetLibraries.cmake
+# Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
-ctkMacroGetTargetLibraries(KIT_target_libraries)
+ctkFunctionGetTargetLibraries(KIT_target_libraries)
 
 # Configure file will be configured using CTK_WRAP_PYTHONQT_{LIGHT, FULL} variable
 CONFIGURE_FILE(
@@ -74,22 +74,30 @@ IF(CTK_WRAP_PYTHONQT_LIGHT OR CTK_WRAP_PYTHONQT_FULL)
   # and set variables holding list of pythonqt initialization method
   SET(CTK_PYTHONQT_INITIALIZATION_METHOD_DEFINITION)
   SET(CTK_PYTHONQT_INITIALIZATION_METHOD_CALL)
+  
+  # To avoid the complex process of resolving the dependencies associated with each 
+  # external project required by each decorator. For now, let's just include the decorator 
+  # associated with CTKCore and CTKWidgets.
+  SET(MY_CTK_WRAPPED_LIBRARIES_PYTHONQT)
+  IF(CTK_LIB_Core)
+    LIST(APPEND MY_CTK_WRAPPED_LIBRARIES_PYTHONQT CTKCore)
+  ENDIF()
+  IF(CTK_LIB_Widgets)
+    LIST(APPEND MY_CTK_WRAPPED_LIBRARIES_PYTHONQT CTKWidgets)
+  ENDIF()
+  
+  FOREACH(lib_name ${MY_CTK_WRAPPED_LIBRARIES_PYTHONQT})
 
-  FOREACH(lib ${CTK_LIBS})
-    ctkFunctionExtractOptionNameAndValue(${lib} lib_name lib_value)
-    IF(${CTK_LIB_${lib_name}})
-      STRING(REPLACE "/" "" lib_name_no_slash ${lib_name})
+    LIST(APPEND KIT_target_libraries ${lib_name}PythonQt)
 
-      LIST(APPEND KIT_target_libraries CTK${lib_name_no_slash}PythonQt)
+    SET(CTK_PYTHONQT_INITIALIZATION_METHOD_DEFINITION
+      "${CTK_PYTHONQT_INITIALIZATION_METHOD_DEFINITION}
+void PythonQt_init_org_commontk_${lib_name}(PyObject*);")
 
-      SET(CTK_PYTHONQT_INITIALIZATION_METHOD_DEFINITION
-        "${CTK_PYTHONQT_INITIALIZATION_METHOD_DEFINITION}
-void PythonQt_init_org_commontk_CTK${lib_name_no_slash}(PyObject*);")
+    SET(CTK_PYTHONQT_INITIALIZATION_METHOD_CALL
+      "${CTK_PYTHONQT_INITIALIZATION_METHOD_CALL}
+PythonQt_init_org_commontk_${lib_name}(0);")
 
-      SET(CTK_PYTHONQT_INITIALIZATION_METHOD_CALL
-        "${CTK_PYTHONQT_INITIALIZATION_METHOD_CALL}
-PythonQt_init_org_commontk_CTK${lib_name_no_slash}(0);")
-    ENDIF()
   ENDFOREACH()
 ENDIF()
 

@@ -9,9 +9,6 @@ SET(KIT_export_directive "CTK_WIDGETS_EXPORT")
 
 # Source files
 SET(KIT_SRCS
-  ctkWorkflowAbstractWidgetStep.cpp
-  ctkWorkflowAbstractWidgetStep.h
-  ctkWorkflowAbstractWidgetStep_p.h
   ctkActionsWidget.cpp
   ctkActionsWidget.h
   ctkAddRemoveComboBox.cpp
@@ -36,8 +33,9 @@ SET(KIT_SRCS
   ctkColorDialog.h
   ctkColorPickerButton.cpp
   ctkColorPickerButton.h
-  ctkConsoleWidget.cpp
-  ctkConsoleWidget.h
+  ctkConsole.cpp
+  ctkConsole.h
+  ctkConsole_p.h
   ctkConfirmExitDialog.cpp
   ctkConfirmExitDialog.h
   ctkCoordinatesWidget.cpp
@@ -50,14 +48,22 @@ SET(KIT_SRCS
   ctkDoubleSlider.h
   ctkDynamicSpacer.cpp
   ctkDynamicSpacer.h
+  ctkErrorLogStatusMessageHandler.cpp
+  ctkErrorLogStatusMessageHandler.h
+  ctkErrorLogWidget.cpp
+  ctkErrorLogWidget.h
   ctkFileDialog.cpp
   ctkFileDialog.h
   ctkFittedTextBrowser.cpp
   ctkFittedTextBrowser.h
+  ctkFlowLayout.cpp
+  ctkFlowLayout.h
   ctkFontButton.cpp
   ctkFontButton.h
   ctkIconEnginePlugin.cpp
   ctkIconEnginePlugin.h
+  ctkLayoutManager.cpp
+  ctkLayoutManager.h
   ctkMaterialPropertyPreviewLabel.cpp
   ctkMaterialPropertyPreviewLabel.h
   ctkMaterialPropertyWidget.cpp
@@ -66,6 +72,8 @@ SET(KIT_SRCS
   ctkMatrixWidget.h
   ctkMenuButton.cpp
   ctkMenuButton.h
+  ctkModalityWidget.cpp
+  ctkModalityWidget.h
   ctkPathLineEdit.cpp
   ctkPathLineEdit.h
   ctkPixmapIconEngine.cpp
@@ -83,6 +91,10 @@ SET(KIT_SRCS
   ctkSettingsDialog.h
   ctkSettingsPanel.cpp
   ctkSettingsPanel.h
+  ctkSimpleLayoutManager.cpp
+  ctkSimpleLayoutManager.h
+  ctkQImageView.cpp
+  ctkQImageView.h
   ctkSliderWidget.cpp
   ctkSliderWidget.h
   ctkTestApplication.cpp
@@ -116,14 +128,26 @@ SET(KIT_SRCS
   ctkWorkflowWidget.cpp
   ctkWorkflowWidget.h
   ctkWorkflowWidgetStep.cpp
+  ctkWorkflowWidgetStep_p.h
   ctkWorkflowWidgetStep.h
   ctkDateRangeWidget.cpp
   ctkDateRangeWidget.h
   )
 
+IF(CTK_WRAP_PYTHONQT_LIGHT)
+  LIST(APPEND KIT_SRCS
+    ctkWidgetsPythonQtDecorators.h
+    )
+  # Let's make sure the decorator are not wrapped !
+  SET_SOURCE_FILES_PROPERTIES(
+    ctkWidgetsPythonQtDecorators.h
+    WRAP_EXCLUDE
+    )
+ENDIF()
+
 # Headers that should run through moc
 SET(KIT_MOC_SRCS
-  ctkWorkflowAbstractWidgetStep_p.h
+  ctkWorkflowAbstractPagedWidget.h
   ctkActionsWidget.h
   ctkAxesWidget.h
   ctkAddRemoveComboBox.h
@@ -137,20 +161,26 @@ SET(KIT_MOC_SRCS
   ctkColorDialog.h
   ctkColorPickerButton.h
   ctkConfirmExitDialog.h
-  ctkConsoleWidget.h
+  ctkConsole.h
+  ctkConsole_p.h
   ctkCoordinatesWidget.h
   ctkDirectoryButton.h
   ctkDoubleRangeSlider.h
   ctkDoubleSlider.h
   ctkDynamicSpacer.h
+  ctkErrorLogWidget.h
+  ctkErrorLogStatusMessageHandler.h
   ctkFileDialog.h
   ctkFittedTextBrowser.h
+  ctkFlowLayout.h
   ctkFontButton.h
   ctkIconEnginePlugin.h
+  ctkLayoutManager.h
   ctkMaterialPropertyPreviewLabel.h
   ctkMaterialPropertyWidget.h
   ctkMatrixWidget.h
   ctkMenuButton.h
+  ctkModalityWidget.h
   ctkPathLineEdit.h
   ctkRangeSlider.h
   ctkRangeWidget.h
@@ -159,6 +189,8 @@ SET(KIT_MOC_SRCS
   ctkSettings.h
   ctkSettingsDialog.h
   ctkSettingsPanel.h
+  ctkSimpleLayoutManager.h
+  ctkQImageView.h
   ctkSliderWidget.h
   ctkTestApplication.h
   ctkToolTipTrapper.h
@@ -176,15 +208,25 @@ SET(KIT_MOC_SRCS
   ctkWorkflowTabWidget.h
   ctkWorkflowWidget.h
   ctkWorkflowWidgetStep.h
+  ctkWorkflowWidgetStep_p.h
   ctkDateRangeWidget.h
   )
+
+
+IF(CTK_WRAP_PYTHONQT_LIGHT)
+  LIST(APPEND KIT_MOC_SRCS
+    ctkWidgetsPythonQtDecorators.h
+    )
+ENDIF()
 
 # UI files
 SET(KIT_UI_FORMS
   Resources/UI/ctkAddRemoveComboBox.ui
   Resources/UI/ctkRangeWidget.ui
   Resources/UI/ctkDateRangeWidget.ui
+  Resources/UI/ctkErrorLogWidget.ui
   Resources/UI/ctkMaterialPropertyWidget.ui
+  Resources/UI/ctkModalityWidget.ui
   Resources/UI/ctkScreenshotDialog.ui
   Resources/UI/ctkSettingsDialog.ui
   Resources/UI/ctkSliderWidget.ui
@@ -196,9 +238,9 @@ SET(KIT_resources
   Resources/CTKWidgets.qrc
   )
 
-# Target libraries - See CMake/ctkMacroGetTargetLibraries.cmake
+# Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
-ctkMacroGetTargetLibraries(KIT_target_libraries)
+ctkFunctionGetTargetLibraries(KIT_target_libraries)
 
 ctkMacroBuildLib(
   NAME ${PROJECT_NAME}

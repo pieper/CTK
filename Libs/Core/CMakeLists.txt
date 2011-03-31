@@ -4,7 +4,7 @@ PROJECT(CTKCore)
 SET(CMAKE_MODULE_PATH ${CTKCore_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
 
 # CMake Macros
-INCLUDE(CMake/ctkMacroBFDCheck.cmake)
+INCLUDE(CMake/ctkMacroBFDCheck.cmake) # HAVE_BFD will be set to True if it applies
 
 #
 # See CTK/CMake/ctkMacroBuildLib.cmake for details
@@ -30,6 +30,15 @@ SET(KIT_SRCS
   ctkCommandLineParser.h
   ctkDependencyGraph.cpp
   ctkDependencyGraph.h
+  ctkErrorLogModel.cpp
+  ctkErrorLogModel.h
+  ctkErrorLogFDMessageHandler.cpp
+  ctkErrorLogFDMessageHandler.h
+  ctkErrorLogFDMessageHandler_p.h
+  ctkErrorLogQtMessageHandler.cpp
+  ctkErrorLogQtMessageHandler.h
+  ctkErrorLogStreamMessageHandler.cpp
+  ctkErrorLogStreamMessageHandler.h
   ctkLogger.cpp
   ctkLogger.h
   ctkHistogram.cpp
@@ -46,31 +55,52 @@ SET(KIT_SRCS
   ctkUtils.h
   ctkWorkflow.h
   ctkWorkflow.cpp
+  ctkWorkflow_p.h
   ctkWorkflowStep.h
   ctkWorkflowStep.cpp
   ctkWorkflowStep_p.h
   ctkWorkflowTransitions.h
   )
 
-IF(CTK_HAVE_BFD)
+IF(HAVE_BFD)
   LIST(APPEND KIT_SRCS
     ctkBinaryFileDescriptor.cpp
     ctkBinaryFileDescriptor.h
     )
 ENDIF()
 
+IF(CTK_WRAP_PYTHONQT_LIGHT)
+  LIST(APPEND KIT_SRCS
+    ctkCorePythonQtDecorators.h
+    )
+  # Let's make sure the decorator are not wrapped !
+  SET_SOURCE_FILES_PROPERTIES(
+    ctkCorePythonQtDecorators.h
+    WRAP_EXCLUDE
+    )
+ENDIF()
+
 # Headers that should run through moc
 SET(KIT_MOC_SRCS
   ctkCommandLineParser.h
-  ctkLogger.h 
+  ctkErrorLogFDMessageHandler_p.h
+  ctkErrorLogModel.h
+  ctkLogger.h
   ctkHistogram.h
   ctkModelTester.h
   ctkTransferFunction.h
   ctkTransferFunctionRepresentation.h
   ctkWorkflow.h
+  ctkWorkflow_p.h
   ctkWorkflowStep_p.h
   ctkWorkflowTransitions.h
   )
+
+IF(CTK_WRAP_PYTHONQT_LIGHT)
+  LIST(APPEND KIT_MOC_SRCS
+    ctkCorePythonQtDecorators.h
+    )
+ENDIF()
 
 # UI files
 SET(KIT_UI_FORMS
@@ -80,11 +110,11 @@ SET(KIT_UI_FORMS
 SET(KIT_resources
 )
 
-# Target libraries - See CMake/ctkMacroGetTargetLibraries.cmake
+# Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
 SET(KIT_target_libraries)
 
-ctkMacroGetTargetLibraries(KIT_target_libraries)
+ctkFunctionGetTargetLibraries(KIT_target_libraries)
 
 ctkMacroBuildLib(
   NAME ${PROJECT_NAME}

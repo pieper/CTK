@@ -1,5 +1,6 @@
 /**
-\class ctkPimpl ctkPimpl
+\page CorePimpl CTK Pimpl Macros
+
 \brief Utility macros for handling private implementations. It is in addition
        to QtGlobal: Q_DECLARE_PRIVATE, Q_DECLARE_PUBLIC,
        Q_D and Q_Q.
@@ -45,6 +46,65 @@ Use the Q_D() macros from functions in
 the public class to access the private class. Similarly, functions in the
 private class can invoke functions in the public class by using the Q_Q()
 macro.
+\section example Example
+Header file (ctkFooObject.h):
+\code
+// Qt includes
+#include <QObject>
+
+// CTK includes
+#include "ctkCoreExport.h"
+class ctkFooObjectPrivate;
+
+class CTK_CORE_EXPORT ctkFooObject: public QObject
+{
+public:
+  ctkFooObject(QObject* parent = 0);
+  virtual ~ctkFooObject();
+
+  void setProperty(double property);
+  double property()const;
+
+protected:
+  QScopedPointer<ctkFooObjectPrivate> d_ptr;
+ 
+private:
+  Q_DECLARE_PRIVATE(ctkFooObject);
+  Q_DISABLE_COPY(ctkFooObject);
+};
+\endcode
+Implementation file (ctkFooObject.cpp):
+\code
+// CTK includes
+#include "ctkFooObject.h"
+
+class ctkFooObjectPrivate
+{
+public:
+  void processSomething();
+
+  double MyProperty;
+};
+
+ctkFooObject::ctkFooObject(QObject* parentObject)
+  : d_ptr(new ctkFooObjectPrivate)
+{
+  Q_D(ctkFooObject);
+  d->MyProperty = 10.;
+}
+
+void ctkFooObject::setProperty(double newProperty)
+{
+  Q_D(ctkFooObject);
+  d->MyProperty = newProperty;
+}
+
+double ctkFooObject::property()const
+{
+  Q_D(const ctkFooObject);
+  return d->MyProperty;
+}
+\endcode
 */
 
 #ifndef __ctkPimpl_h
@@ -53,20 +113,27 @@ macro.
 // Qt includes
 #include <QtGlobal>
 
-/*! \relates ctkPimpl
+/*!
+ * \ingroup Core
+ * @{
+ */
+
+/*!
  * Define a public class constructor with no argument
  *
  * Also make sure the Pimpl is initalized
+ * \see \ref CorePimpl
  */
 #define CTK_CONSTRUCTOR_NO_ARG_CPP(PUB)  \
   PUB::PUB(): d_ptr(new PUB##Private)    \
     {                                    \
     }
 
-/*! \relates ctkPimpl
+/*!
  * Define a public class constructor with one argument
  *
  * Also make sure the Pimpl is initalized
+ * \see \ref CorePimpl
  */
 #define CTK_CONSTRUCTOR_1_ARG_CPP(PUB, _ARG1)   \
   PUB::PUB(_ARG1 _parent)                       \
@@ -75,12 +142,13 @@ macro.
     {                                           \
     }
     
-/*! \relates ctkPimpl
+/*!
  * Define the setter in the public class.
  *
  * This should be put in the .cxx file of the public class. The parameter are
  * the name of the public class (PUB), the type of the argument to return (_TYPE),
  * the name of the getter(_NAME) and the name of the variable in the Private class(_VARNAME).
+ * \see \ref CorePimpl
  */
 #define CTK_SET_CPP(PUB, _TYPE, _NAME, _VARNAME)    \
   void PUB::_NAME(_TYPE var)                        \
@@ -89,12 +157,13 @@ macro.
     d->_VARNAME =  var;                             \
   }
 
-/*! \relates ctkPimpl
+/*!
  * Define the setter in the public class.
  *
  * This should be put in the .cxx file of the public class. The parameter are
  * the name of the public class (PUB), the type of the argument to return (_TYPE),
  * the name of the setter(_NAME) and the name of the variable in the Private class(_VARNAME).
+ * \see \ref CorePimpl
  */
 #define CTK_GET_CPP(PUB, _TYPE, _NAME, _VARNAME)   \
   _TYPE PUB::_NAME()const                          \
@@ -102,5 +171,7 @@ macro.
     Q_D(const PUB);                                \
     return d->_VARNAME;                            \
   }
+
+/**@}*/
 
 #endif

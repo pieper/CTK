@@ -33,12 +33,13 @@
 #include "ctkServiceRegistrationPrivate.h"
 #include "ctkPluginFrameworkContext_p.h"
 
-
+//----------------------------------------------------------------------------
 ctkServiceReferencePrivate::ctkServiceReferencePrivate(ctkServiceRegistrationPrivate* reg)
   : ref(1), registration(reg)
 {
 }
 
+//----------------------------------------------------------------------------
 QObject* ctkServiceReferencePrivate::getService(QSharedPointer<ctkPlugin> plugin)
 {
   QObject* s = 0;
@@ -63,14 +64,14 @@ QObject* ctkServiceReferencePrivate::getService(QSharedPointer<ctkPlugin> plugin
             ctkServiceException se("ctkServiceFactory throw an exception",
                                    ctkServiceException::FACTORY_EXCEPTION, &pe);
             plugin->d_func()->fwCtx->listeners.frameworkError
-                (registration->plugin->q_func().data(), se);
+                (registration->plugin->q_func(), se);
             return 0;
           }
           if (s == 0) {
             ctkServiceException se("ctkServiceFactory produced null",
                                    ctkServiceException::FACTORY_ERROR);
             plugin->d_func()->fwCtx->listeners.frameworkError
-                (registration->plugin->q_func().data(), se);
+                (registration->plugin->q_func(), se);
             return 0;
           }
           for (QStringListIterator i(classes); i.hasNext(); )
@@ -82,7 +83,7 @@ QObject* ctkServiceReferencePrivate::getService(QSharedPointer<ctkPlugin> plugin
                                      "that did not implement: " + cls,
                                      ctkServiceException::FACTORY_ERROR);
               plugin->d_func()->fwCtx->listeners.frameworkError
-                  (registration->plugin->q_func().data(), se);
+                  (registration->plugin->q_func(), se);
               return 0;
             }
           }
@@ -110,6 +111,7 @@ QObject* ctkServiceReferencePrivate::getService(QSharedPointer<ctkPlugin> plugin
   return s;
 }
 
+//----------------------------------------------------------------------------
 bool ctkServiceReferencePrivate::ungetService(QSharedPointer<ctkPlugin> plugin, bool checkRefCounter)
 {
   QMutexLocker lock(&registration->propsLock);
@@ -151,7 +153,7 @@ bool ctkServiceReferencePrivate::ungetService(QSharedPointer<ctkPlugin> plugin, 
       }
       catch (const std::exception& e)
       {
-        plugin->d_func()->fwCtx->listeners.frameworkError(registration->plugin->q_func().data(), e);
+        plugin->d_func()->fwCtx->listeners.frameworkError(registration->plugin->q_func(), e);
       }
     }
     registration->dependents.remove(plugin);
@@ -160,7 +162,8 @@ bool ctkServiceReferencePrivate::ungetService(QSharedPointer<ctkPlugin> plugin, 
   return hadReferences;
 }
 
-ServiceProperties ctkServiceReferencePrivate::getProperties() const
+//----------------------------------------------------------------------------
+ctkDictionary ctkServiceReferencePrivate::getProperties() const
 {
   return registration->properties;
 }

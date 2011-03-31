@@ -64,6 +64,13 @@ MACRO(ctkMacroBuildLib)
   INCLUDE_DIRECTORIES(
     ${my_includes}
     )
+    
+  # Add the library directories from the external project
+  ctkFunctionGetLibraryDirs(my_library_dirs ${lib_name})
+  
+  LINK_DIRECTORIES(
+    ${my_library_dirs}
+    )
 
 
   SET(MY_LIBRARY_EXPORT_DIRECTIVE ${MY_EXPORT_DIRECTIVE})
@@ -100,6 +107,30 @@ MACRO(ctkMacroBuildLib)
     ${MY_MOC_CPP}
     ${MY_UI_CPP}
     )
+
+  # Since the PythonQt decorator depends on PythonQt, Python and VTK, let's link against
+  # these ones to avoid complaints of MSVC
+  # Note: "LINK_DIRECTORIES" has to be invoked before "ADD_LIBRARY"
+  SET(my_EXTRA_PYTHON_LIBRARIES)
+  IF(CTK_WRAP_PYTHONQT_LIGHT AND NOT ${MY_DISABLE_WRAP_PYTHONQT})
+    # Does a header having the expected filename exists ?
+    STRING(REGEX REPLACE "^CTK" "ctk" lib_name_lc_ctk ${lib_name})
+    SET(decorator_header_filename ${lib_name_lc_ctk}PythonQtDecorators.h)
+    IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${decorator_header_filename})
+      LIST(APPEND my_EXTRA_PYTHON_LIBRARIES ${PYTHON_LIBRARY} ${PYTHONQT_LIBRARIES})
+      # Should we link against VTK
+      IF(CTK_LIB_Scripting/Python/Core_PYTHONQT_USE_VTK)
+        LIST(APPEND my_EXTRA_PYTHON_LIBRARIES vtkCommon vtkPythonCore)
+      ENDIF()
+    ENDIF()
+  ENDIF()
+
+  # The current library might not be wrapped. Nevertheless, if one of its dependent library
+  # is linked using vtkCommon or vtkPythonCore, VTK_LIBRARY_DIRS should be added
+  # as a link directories.
+  IF(CTK_WRAP_PYTHONQT_LIGHT AND CTK_LIB_Scripting/Python/Core_PYTHONQT_USE_VTK)
+    LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
+  ENDIF()
   
   ADD_LIBRARY(${lib_name} ${MY_LIBRARY_TYPE}
     ${MY_SRCS}
@@ -115,6 +146,7 @@ MACRO(ctkMacroBuildLib)
   IF(CTK_LIBRARY_PROPERTIES AND MY_LIBRARY_TYPE STREQUAL "SHARED")
     SET_TARGET_PROPERTIES(${lib_name} PROPERTIES ${CTK_LIBRARY_PROPERTIES})
   ENDIF()
+  SET_TARGET_PROPERTIES(${lib_name} PROPERTIES CTK_LIB_TARGET_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
   # Install rules
   IF(CTK_BUILD_SHARED_LIBS)
@@ -127,12 +159,13 @@ MACRO(ctkMacroBuildLib)
   SET(my_libs
     ${MY_TARGET_LIBRARIES}
     )
-	
+
   IF(MINGW)
     LIST(APPEND my_libs ssp) # add stack smash protection lib
   ENDIF(MINGW)
-  
-  TARGET_LINK_LIBRARIES(${lib_name} ${my_libs})
+
+  # See above for definition of my_EXTRA_PYTHON_LIBRARIES
+  TARGET_LINK_LIBRARIES(${lib_name} ${my_libs} ${my_EXTRA_PYTHON_LIBRARIES})
 
   # Update CTK_BASE_LIBRARIES
   SET(CTK_BASE_LIBRARIES ${my_libs} ${lib_name} CACHE INTERNAL "CTK base libraries" FORCE)
@@ -156,6 +189,8 @@ MACRO(ctkMacroBuildLib)
     IF(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
       SET_TARGET_PROPERTIES(${lib_name}PythonQt PROPERTIES COMPILE_FLAGS "-fPIC")
     ENDIF()
+    # Set labels associated with the target.
+    SET_TARGET_PROPERTIES(${lib_name}PythonQt PROPERTIES LABELS ${lib_name})
 
     # Update list of libraries wrapped with PythonQt
     SET(CTK_WRAPPED_LIBRARIES_PYTHONQT

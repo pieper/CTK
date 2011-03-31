@@ -30,19 +30,21 @@
 
 #include <QStringList>
 
-
+//----------------------------------------------------------------------------
 ctkPlugin::ctkPlugin()
 : d_ptr(0)
 {
 
 }
 
+//----------------------------------------------------------------------------
 void ctkPlugin::init(ctkPluginPrivate* dd)
 {
   if (d_ptr) throw std::logic_error("ctkPlugin already initialized");
   d_ptr = dd;
 }
 
+//----------------------------------------------------------------------------
 void ctkPlugin::init(const QWeakPointer<ctkPlugin>& self,
                      ctkPluginFrameworkContext* fw,
                      ctkPluginArchive* pa)
@@ -51,17 +53,20 @@ void ctkPlugin::init(const QWeakPointer<ctkPlugin>& self,
   d_ptr = new ctkPluginPrivate(self, fw, pa);
 }
 
+//----------------------------------------------------------------------------
 ctkPlugin::~ctkPlugin()
 {
   delete d_ptr;
 }
 
+//----------------------------------------------------------------------------
 ctkPlugin::State ctkPlugin::getState() const
 {
   Q_D(const ctkPlugin);
   return d->state;
 }
 
+//----------------------------------------------------------------------------
 void ctkPlugin::start(const StartOptions& options)
 {
   Q_D(ctkPlugin);
@@ -108,6 +113,7 @@ void ctkPlugin::start(const StartOptions& options)
   }
 }
 
+//----------------------------------------------------------------------------
 void ctkPlugin::stop(const StopOptions& options)
 {
   Q_D(ctkPlugin);
@@ -167,6 +173,7 @@ void ctkPlugin::stop(const StopOptions& options)
   }
 }
 
+//----------------------------------------------------------------------------
 void ctkPlugin::uninstall()
 {
   bool wasResolved = false;
@@ -206,7 +213,7 @@ void ctkPlugin::uninstall()
         catch (const std::exception& exception)
         {
           // NYI! not call inside lock
-          d->fwCtx->listeners.frameworkError(this, exception);
+          d->fwCtx->listeners.frameworkError(this->d_func()->q_func(), exception);
         }
       }
     }
@@ -214,7 +221,7 @@ void ctkPlugin::uninstall()
     {
       d->deactivating = false;
       //fwCtx.packages.notifyAll();
-      d->fwCtx->listeners.frameworkError(this, e);
+      d->fwCtx->listeners.frameworkError(this->d_func()->q_func(), e);
     }
     // Fall through
   case RESOLVED:
@@ -271,6 +278,7 @@ void ctkPlugin::uninstall()
   }
 }
 
+//----------------------------------------------------------------------------
 ctkPluginContext* ctkPlugin::getPluginContext() const
 {
   //TODO security checks
@@ -278,12 +286,14 @@ ctkPluginContext* ctkPlugin::getPluginContext() const
   return d->pluginContext.data();
 }
 
+//----------------------------------------------------------------------------
 long ctkPlugin::getPluginId() const
 {
   Q_D(const ctkPlugin);
   return d->id;
 }
 
+//----------------------------------------------------------------------------
 QString ctkPlugin::getLocation() const
 {
   //TODO security
@@ -291,6 +301,7 @@ QString ctkPlugin::getLocation() const
   return d->location;
 }
 
+//----------------------------------------------------------------------------
 QHash<QString, QString> ctkPlugin::getHeaders()
 {
   //TODO security
@@ -309,30 +320,83 @@ QHash<QString, QString> ctkPlugin::getHeaders()
   return d->cachedRawHeaders;
 }
 
+//----------------------------------------------------------------------------
 QString ctkPlugin::getSymbolicName() const
 {
   Q_D(const ctkPlugin);
   return d->symbolicName;
 }
 
+//----------------------------------------------------------------------------
 QStringList ctkPlugin::getResourceList(const QString& path) const
 {
   Q_D(const ctkPlugin);
   return d->archive->findResourcesPath(path);
 }
 
+//----------------------------------------------------------------------------
 QByteArray ctkPlugin::getResource(const QString& path) const
 {
   Q_D(const ctkPlugin);
   return d->archive->getPluginResource(path);
 }
 
+//----------------------------------------------------------------------------
+ctkPluginLocalization ctkPlugin::getPluginLocalization(
+  const QLocale& locale, const QString& base) const
+{
+  Q_D(const ctkPlugin);
+
+  // There are five searching candidates possible:
+  // base +
+  //    "_" + language1 + "_" + country1 + ".qm"
+  // or "_" + language1 + ".qm"
+  // or "_" + language2 + "_" + country2 + ".qm"
+  // or "_" + language2 + ".qm"
+  // or ""  + ".qm"
+  //
+  // Where language1[_country1[_variation1]] is the requested locale,
+  // and language2[_country2[_variation2]] is the default locale.
+
+  QChar localeSep('_');
+  QChar baseSep('_');
+
+  QStringList searchCandidates;
+
+  QStringList localeParts = locale.name().split(localeSep);
+  QStringList defaultParts = QLocale().name().split(localeSep);
+
+  searchCandidates << baseSep + localeParts[0] + localeSep + localeParts[1];
+  searchCandidates << baseSep + localeParts[0];
+  searchCandidates << baseSep + defaultParts[0] + localeSep + defaultParts[1];
+  searchCandidates << baseSep + defaultParts[0];
+  searchCandidates << "";
+
+  QString localizationPath = base.left(base.lastIndexOf('/'));
+  QStringList resourceList = this->getResourceList(localizationPath);
+
+  foreach(QString resource, resourceList)
+  {
+    foreach(QString candidate, searchCandidates)
+    {
+      if (resource.endsWith(candidate + ".qm"))
+      {
+        return ctkPluginLocalization(localizationPath + '/' + resource, locale, d->q_ptr);
+      }
+    }
+  }
+
+  return ctkPluginLocalization();
+}
+
+//----------------------------------------------------------------------------
 ctkVersion ctkPlugin::getVersion() const
 {
   Q_D(const ctkPlugin);
   return d->version;
 }
 
+//----------------------------------------------------------------------------
 QDebug operator<<(QDebug debug, ctkPlugin::State state)
 {
   switch (state)
@@ -354,6 +418,7 @@ QDebug operator<<(QDebug debug, ctkPlugin::State state)
   }
 }
 
+//----------------------------------------------------------------------------
 QDebug operator<<(QDebug debug, const ctkPlugin& plugin)
 {
   debug.nospace() << "ctkPlugin[" << "id=" << plugin.getPluginId() <<
@@ -362,7 +427,21 @@ QDebug operator<<(QDebug debug, const ctkPlugin& plugin)
   return debug.maybeSpace();
 }
 
+//----------------------------------------------------------------------------
 QDebug operator<<(QDebug debug, ctkPlugin const * plugin)
 {
   return operator<<(debug, *plugin);
+}
+
+//----------------------------------------------------------------------------
+ctkLogStream& operator<<(ctkLogStream& stream, ctkPlugin const * plugin)
+{
+  stream << plugin->getSymbolicName();
+  return stream;
+}
+
+//----------------------------------------------------------------------------
+ctkLogStream& operator<<(ctkLogStream& stream, const QSharedPointer<ctkPlugin>& plugin)
+{
+  return operator<<(stream, plugin.data());
 }

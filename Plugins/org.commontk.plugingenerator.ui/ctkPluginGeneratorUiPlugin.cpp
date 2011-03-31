@@ -33,7 +33,7 @@ void ctkPluginGeneratorUiPlugin::start(ctkPluginContext* context)
 {
   mainExtension = new ctkPluginGeneratorMainExtension();
 
-  ServiceProperties props;
+  ctkDictionary props;
   props.insert(ctkPluginConstants::SERVICE_RANKING, 0);
   context->registerService(QStringList("ctkPluginGeneratorAbstractUiExtension"),
                            mainExtension, props);

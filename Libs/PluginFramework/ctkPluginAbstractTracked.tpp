@@ -24,33 +24,39 @@
 
 #include <QDebug>
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 const bool ctkPluginAbstractTracked<S,T,R>::DEBUG	= true;
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 ctkPluginAbstractTracked<S,T,R>::ctkPluginAbstractTracked()
 {
   closed = false;
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 ctkPluginAbstractTracked<S,T,R>::~ctkPluginAbstractTracked()
 {
 
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 bool ctkPluginAbstractTracked<S,T,R>::wait(unsigned long timeout)
 {
   return waitCond.wait(this, timeout);
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 void ctkPluginAbstractTracked<S,T,R>::wakeAll()
 {
   waitCond.wakeAll();
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 void ctkPluginAbstractTracked<S,T,R>::setInitial(const QList<S>& list)
 {
@@ -64,6 +70,7 @@ void ctkPluginAbstractTracked<S,T,R>::setInitial(const QList<S>& list)
   }
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 void ctkPluginAbstractTracked<S,T,R>::trackInitial()
 {
@@ -119,12 +126,14 @@ void ctkPluginAbstractTracked<S,T,R>::trackInitial()
   }
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 void ctkPluginAbstractTracked<S,T,R>::close()
 {
   closed = true;
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 void ctkPluginAbstractTracked<S,T,R>::track(S item, R related)
 {
@@ -174,6 +183,7 @@ void ctkPluginAbstractTracked<S,T,R>::track(S item, R related)
   }
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 void ctkPluginAbstractTracked<S,T,R>::untrack(S item, R related)
 {
@@ -228,36 +238,62 @@ void ctkPluginAbstractTracked<S,T,R>::untrack(S item, R related)
    */
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 int ctkPluginAbstractTracked<S,T,R>::size() const
 {
   return tracked.size();
 }
 
+//----------------------------------------------------------------------------
+template<class S, class T, class R>
+bool ctkPluginAbstractTracked<S,T,R>::isEmpty() const
+{
+  return tracked.isEmpty();
+}
+
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 T ctkPluginAbstractTracked<S,T,R>::getCustomizedObject(S item) const
 {
   return tracked.value(item);
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 QList<S> ctkPluginAbstractTracked<S,T,R>::getTracked() const
 {
   return tracked.keys();
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 void ctkPluginAbstractTracked<S,T,R>::modified()
 {
   trackingCount.ref();
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 int ctkPluginAbstractTracked<S,T,R>::getTrackingCount() const
 {
   return trackingCount;
 }
 
+//----------------------------------------------------------------------------
+template<class S, class T, class R>
+QMap<S,T> ctkPluginAbstractTracked<S,T,R>::copyEntries(QMap<S,T>& map) const
+{
+  typename QHash<S,T>::ConstIterator end = tracked.end();
+  for (typename QHash<S,T>::ConstIterator it = tracked.begin();
+       it != end; ++it)
+  {
+    map.insert(it.key(), it.value());
+  }
+  return map;
+}
+
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 bool ctkPluginAbstractTracked<S,T,R>::customizerAddingFinal(S item, const T& custom)
 {
@@ -282,6 +318,7 @@ bool ctkPluginAbstractTracked<S,T,R>::customizerAddingFinal(S item, const T& cus
   }
 }
 
+//----------------------------------------------------------------------------
 template<class S, class T, class R>
 void ctkPluginAbstractTracked<S,T,R>::trackAdding(S item, R related)
 {

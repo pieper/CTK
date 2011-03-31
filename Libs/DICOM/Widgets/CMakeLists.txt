@@ -9,6 +9,8 @@ SET(KIT_export_directive "CTK_DICOM_WIDGETS_EXPORT")
   
 # Source files
 SET(KIT_SRCS
+  ctkDICOMDatasetView.cpp
+  ctkDICOMDatasetView.h
   ctkDICOMDirectoryListWidget.cpp
   ctkDICOMDirectoryListWidget.h
   ctkDICOMListenerWidget.cpp
@@ -21,13 +23,26 @@ SET(KIT_SRCS
   ctkDICOMQueryWidget.h
   ctkDICOMQueryResultsTabWidget.cpp
   ctkDICOMQueryResultsTabWidget.h
+  ctkDICOMAppWidget.cpp
+  ctkDICOMAppWidget.h
+  ctkDICOMThumbnailWidget.cpp
+  ctkDICOMThumbnailWidget.h
+  ctkDICOMThumbnailListWidget.cpp
+  ctkDICOMThumbnailListWidget.h
+  ctkDICOMImportWidget.cpp
+  ctkDICOMImportWidget.h
   )
 
 # Headers that should run through moc
 SET(KIT_MOC_SRCS
-  ctkDICOMQueryRetrieveWidget.h
+  ctkDICOMDatasetView.h
   ctkDICOMDirectoryListWidget.h
   ctkDICOMServerNodeWidget.h
+  ctkDICOMAppWidget.h
+  ctkDICOMThumbnailWidget.h
+  ctkDICOMThumbnailListWidget.h
+  ctkDICOMImportWidget.h
+  ctkDICOMQueryRetrieveWidget.h
   )
 
 # UI files - includes new widgets
@@ -37,15 +52,19 @@ SET(KIT_UI_FORMS
   Resources/UI/ctkDICOMQueryRetrieveWidget.ui
   Resources/UI/ctkDICOMServerNodeWidget.ui
   Resources/UI/ctkDICOMQueryWidget.ui
+  Resources/UI/ctkDICOMAppWidget.ui
+  Resources/UI/ctkDICOMThumbnailWidget.ui
+  Resources/UI/ctkDICOMThumbnailListWidget.ui
+  Resources/UI/ctkDICOMImportWidget.ui
 )
 
 # Resources
 SET(KIT_resources
 )
 
-# Target libraries - See CMake/ctkMacroGetTargetLibraries.cmake
+# Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
-ctkMacroGetTargetLibraries(KIT_target_libraries)
+ctkFunctionGetTargetLibraries(KIT_target_libraries)
 
 ctkMacroBuildLib(
   NAME ${PROJECT_NAME}
@@ -63,5 +82,5 @@ ctkMacroBuildLib(
 
 # Testing
 IF(BUILD_TESTING)
-  #ADD_SUBDIRECTORY(Testing)
+  ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING)

@@ -33,6 +33,7 @@
 #include "ctkConfigurationPluginTestSuite_p.h"
 #include "ctkConfigurationListenerTestSuite_p.h"
 
+//----------------------------------------------------------------------------
 void ctkConfigAdminTestActivator::start(ctkPluginContext* context)
 {
   QString symbolicName = context->getProperty("cm.impl").toString();
@@ -59,7 +60,7 @@ void ctkConfigAdminTestActivator::start(ctkPluginContext* context)
     throw std::logic_error(msg.toStdString());
   }
 
-  ServiceProperties props;
+  ctkDictionary props;
 
   configAdminTestSuite = new ctkConfigurationAdminTestSuite(context, cmPluginId);
   props.clear();
@@ -87,6 +88,7 @@ void ctkConfigAdminTestActivator::start(ctkPluginContext* context)
   context->registerService<ctkTestSuiteInterface>(configListenerTestSuite, props);
 }
 
+//----------------------------------------------------------------------------
 void ctkConfigAdminTestActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context);

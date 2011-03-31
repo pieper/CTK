@@ -40,6 +40,8 @@ class QObject;
 
 
 /**
+ * \ingroup PluginFramework
+ *
  * Data structure for saving information about slots registered for
  * receiving service lifecycle events.
  */
@@ -48,7 +50,7 @@ class ctkServiceSlotEntry
 
 public:
 
-  ctkServiceSlotEntry(ctkPlugin* p, QObject* receiver, const char* slot,
+  ctkServiceSlotEntry(QSharedPointer<ctkPlugin> p, QObject* receiver, const char* slot,
                       const QString& filter = QString());
 
   ctkServiceSlotEntry(const ctkServiceSlotEntry& other);
@@ -68,7 +70,7 @@ public:
 
   bool isRemoved() const;
 
-  ctkPlugin* getPlugin() const;
+  QSharedPointer<ctkPlugin> getPlugin() const;
 
   ctkLDAPExpr getLDAPExpr() const;
 
@@ -82,6 +84,9 @@ private:
 
 };
 
+/**
+ * \ingroup PluginFramework
+ */
 uint qHash(const ctkServiceSlotEntry& serviceSlot);
 
 #endif // CTKSERVICESLOTENTRY_P_H

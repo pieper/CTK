@@ -27,6 +27,9 @@
 #include <QMetaType>
 
 #include "ctkVersion.h"
+#include "ctkPluginLocalization.h"
+#include "ctkPluginConstants.h"
+#include "service/log/ctkLogStream.h"
 
 class ctkPluginContext;
 class ctkPluginArchive;
@@ -34,6 +37,8 @@ class ctkPluginFrameworkContext;
 class ctkPluginPrivate;
 
 /**
+ * \ingroup PluginFramework
+ *
  * An installed plugin in the Framework.
  *
  * <p>
@@ -72,7 +77,7 @@ class ctkPluginPrivate;
  * <code>%ctkPlugin</code> objects, and these objects are only valid within the
  * Framework that created them.
  *
- * @threadsafe
+ * @remarks This class is thread safe.
  */
 class CTK_PLUGINFW_EXPORT ctkPlugin {
 
@@ -130,7 +135,7 @@ public:
      *
      * <p>
      * A plugin is in the <code>STARTING</code> state when its
-     * {@link #start(const Options&) start} method is active. A plugin must be in this
+     * {@link #start(const StartOptions&) start} method is active. A plugin must be in this
      * state when the plugin's {@link ctkPluginActivator::start} method is called. If the
      * <code>ctkPluginActivator::start</code> method completes without exception,
      * then the plugin has successfully started and must move to the
@@ -148,7 +153,7 @@ public:
      *
      * <p>
      * A plugin is in the <code>STOPPING</code> state when its
-     * {@link #stop(const Option&) stop} method is active. A plugin must be in this state
+     * {@link #stop(const StopOptions&) stop} method is active. A plugin must be in this state
      * when the plugin's {@link ctkPluginActivator::stop} method is called. When the
      * <code>ctkPluginActivator::stop</code> method completes the plugin is
      * stopped and must move to the <code>RESOLVED</code> state.
@@ -408,8 +413,8 @@ public:
    * <ul>
    * <li>Plugin autostart setting is modified unless the
    * {@link #STOP_TRANSIENT} option was set.
-   * <li><code>getState()</code> not in &#x007B; <code>ACTIVE</code>,
-   * <code>STOPPING</code> &#x007D;.
+   * <li><code>getState()</code> not in &#123; <code>ACTIVE</code>,
+   * <code>STOPPING</code> &#125;.
    * <li><code>ctkPluginActivator::stop</code> has been called and did not throw
    * an exception.
    * </ul>
@@ -464,19 +469,19 @@ public:
    *
    * <b>Preconditions </b>
    * <ul>
-   * <li><code>getState()</code> not in &#x007B; <code>UNINSTALLED</code>
-   * &#x007D;.
+   * <li><code>getState()</code> not in &#123; <code>UNINSTALLED</code>
+   * &#125;.
    * </ul>
    * <b>Postconditions, no exceptions thrown </b>
    * <ul>
-   * <li><code>getState()</code> in &#x007B; <code>UNINSTALLED</code>
-   * &#x007D;.
+   * <li><code>getState()</code> in &#123; <code>UNINSTALLED</code>
+   * &#125;.
    * <li>This plugin has been uninstalled.
    * </ul>
    * <b>Postconditions, when an exception is thrown </b>
    * <ul>
-   * <li><code>getState()</code> not in &#x007B; <code>UNINSTALLED</code>
-   * &#x007D;.
+   * <li><code>getState()</code> not in &#123; <code>UNINSTALLED</code>
+   * &#125;.
    * <li>This plugin has not been uninstalled.
    * </ul>
    *
@@ -635,9 +640,31 @@ public:
   virtual QByteArray getResource(const QString& path) const;
 
   /**
+   * Returns a <code>ctkPluginLocalization</code> object for the
+   * specified <code>locale</code>. The translations are loaded from a
+   * .qm file starting with <code>base</code>.
+   *
+   * You can use the returned <code>ctkPluginLocalization</code>
+   * object to dynamically translate text without changing the current
+   * locale of the application. This can be used for example to
+   * provide localized messages to multiple users which use the application
+   * (maybe some kind of server) simultaneously but require different
+   * localizations.
+   *
+   * @param locale The locale to be used by the returned
+   *        <code>ctkPluginLocalization</code> object.
+   * @param base The base name of the .qm message file which contains
+   *        translated messages. Defaults to
+   *        <code>ctkPluginConstants::PLUGIN_LOCALIZATION_DEFAULT_BASENAME</code>.
+   * @return A locale specific <code>ctkPluginLocalization</code> instance.
+   */
+  ctkPluginLocalization getPluginLocalization(const QLocale& locale,
+                                              const QString& base = ctkPluginConstants::PLUGIN_LOCALIZATION_DEFAULT_BASENAME) const;
+
+  /**
    * Returns the version of this plugin as specified by its
    * <code>Plugin-Version</code> manifest header. If this plugin does not have a
-   * specified version then {@link Version#emptyVersion} is returned.
+   * specified version then {@link ctkVersion#emptyVersion} is returned.
    *
    * <p>
    * This method must continue to return this plugin's version while
@@ -664,6 +691,11 @@ protected:
   void init(const QWeakPointer<ctkPlugin>& self, ctkPluginFrameworkContext* fw, ctkPluginArchive* ba);
 };
 
+/**
+ * \ingroup PluginFramework
+ * @{
+ */
+
 Q_DECLARE_METATYPE(ctkPlugin*)
 Q_DECLARE_METATYPE(QSharedPointer<ctkPlugin>)
 
@@ -674,5 +706,10 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(ctkPlugin::StopOptions)
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug debug, ctkPlugin::State state);
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug debug, const ctkPlugin& plugin);
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug debug, ctkPlugin const * plugin);
+
+CTK_PLUGINFW_EXPORT ctkLogStream& operator<<(ctkLogStream& stream, ctkPlugin const * plugin);
+CTK_PLUGINFW_EXPORT ctkLogStream& operator<<(ctkLogStream& stream, const QSharedPointer<ctkPlugin>& plugin);
+
+/** @}*/
 
 #endif // CTKPLUGIN_H

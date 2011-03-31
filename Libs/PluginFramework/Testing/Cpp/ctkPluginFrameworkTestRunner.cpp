@@ -26,6 +26,7 @@
 
 #include <ctkPluginFrameworkFactory.h>
 #include <ctkPluginFramework.h>
+#include <ctkPluginFrameworkLauncher.h>
 #include <ctkPluginContext.h>
 #include <ctkPluginException.h>
 
@@ -37,11 +38,8 @@
 #include <QThread>
 #include <QDebug>
 
-#ifdef _WIN32
-#include <windows.h>
-#include <stdlib.h>
-#endif // _WIN32
 
+//----------------------------------------------------------------------------
 class TestRunner : public QThread
 {
 public:
@@ -91,6 +89,7 @@ private:
   char** argv;
 };
 
+//----------------------------------------------------------------------------
 class ctkPluginFrameworkTestRunnerPrivate
 {
 public:
@@ -111,12 +110,14 @@ public:
 
   ctkPluginFrameworkFactory* fwFactory;
 
+  //----------------------------------------------------------------------------
   ctkPluginFrameworkTestRunnerPrivate()
     : context(0), fwFactory(0)
   {
     pluginLibFilter << "*.dll" << "*.so" << "*.dylib";
   }
 
+  //----------------------------------------------------------------------------
   void installPlugins(const QString& path)
   {
     QDirIterator dirIter(path, pluginLibFilter, QDir::Files);
@@ -145,6 +146,7 @@ public:
     }
   }
 
+  //----------------------------------------------------------------------------
   void installPlugin(const QString& path, const QString& name)
   {
     QDirIterator dirIter(path, pluginLibFilter, QDir::Files);
@@ -182,60 +184,43 @@ private:
   QStringList pluginLibFilter;
 };
 
+//----------------------------------------------------------------------------
 ctkPluginFrameworkTestRunner::ctkPluginFrameworkTestRunner()
   : d_ptr(new ctkPluginFrameworkTestRunnerPrivate())
 {
 
 }
 
+//----------------------------------------------------------------------------
 ctkPluginFrameworkTestRunner::~ctkPluginFrameworkTestRunner()
 {
   Q_D(ctkPluginFrameworkTestRunner);
   delete d->fwFactory;
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkTestRunner::addPluginPath(const QString& path, bool install)
 {
   Q_D(ctkPluginFrameworkTestRunner);
   d->pluginPaths.push_back(qMakePair(path, install));
-#ifdef _WIN32
-  if(_putenv_s("PATH", path.toLatin1().data()))
-  {
-    LPVOID lpMsgBuf;
-    DWORD dw = GetLastError(); 
-
-    FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        dw,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR) &lpMsgBuf,
-        0, NULL );
-
-    QString msg = QString("Adding '%1' to the PATH environment variable failed: %2")
-      .arg(path).arg(QString((LPCTSTR)lpMsgBuf));
-    
-    qWarning() << msg;
-
-    LocalFree(lpMsgBuf);
-  }
-#endif
+  ctkPluginFrameworkLauncher::appendPathEnv(path);
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkTestRunner::addPlugin(const QString &path, const QString &name)
 {
   Q_D(ctkPluginFrameworkTestRunner);
   d->installCandidates.push_back(qMakePair(path, name));
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkTestRunner::startPluginOnRun(const QString& pluginId, ctkPlugin::StartOptions opts)
 {
   Q_D(ctkPluginFrameworkTestRunner);
   d->activatePlugins.push_back(qMakePair(pluginId, opts));
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkTestRunner::init(const ctkProperties& fwProps)
 {
   Q_D(ctkPluginFrameworkTestRunner);
@@ -260,6 +245,7 @@ void ctkPluginFrameworkTestRunner::init(const ctkProperties& fwProps)
   }
 }
 
+//----------------------------------------------------------------------------
 int ctkPluginFrameworkTestRunner::run(int argc, char** argv)
 {
   Q_D(ctkPluginFrameworkTestRunner);

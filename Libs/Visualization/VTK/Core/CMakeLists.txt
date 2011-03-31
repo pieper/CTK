@@ -20,6 +20,8 @@ SET(KIT_SRCS
   ctkVTKCompositeFunction.h
   ctkVTKConnection.cpp
   ctkVTKConnection.h
+  ctkVTKErrorLogMessageHandler.cpp
+  ctkVTKErrorLogMessageHandler.h
   ctkVTKHistogram.cpp
   ctkVTKHistogram.h
   ctkVTKLookupTable.cpp
@@ -60,9 +62,9 @@ SET(VTK_LIBRARIES
   vtkHybrid
   )
 
-# Target libraries - See CMake/ctkMacroGetTargetLibraries.cmake
+# Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
-ctkMacroGetTargetLibraries(KIT_target_libraries)
+ctkFunctionGetTargetLibraries(KIT_target_libraries)
 
 ctkMacroBuildLib(
   NAME ${PROJECT_NAME}

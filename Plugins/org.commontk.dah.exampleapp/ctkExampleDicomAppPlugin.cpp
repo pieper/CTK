@@ -19,50 +19,52 @@
 
 =============================================================================*/
 
-
-#include "ctkExampleDicomAppPlugin_p.h"
-#include "ctkExampleDicomAppLogic_p.h"
+// Qt includes
 #include <QtPlugin>
 #include <QStringList>
 #include <QString>
 
-ctkExampleDicomAppPlugin* ctkExampleDicomAppPlugin::instance = 0;
+// CTK includes
+#include "ctkExampleDicomAppPlugin_p.h"
+#include "ctkExampleDicomAppLogic_p.h"
 
+ctkPluginContext* ctkExampleDicomAppPlugin::Context = 0;
+
+//----------------------------------------------------------------------------
 ctkExampleDicomAppPlugin::ctkExampleDicomAppPlugin()
-  : appLogic(0), context(0)
+  : AppLogic(0)
 {
 }
 
+//----------------------------------------------------------------------------
 ctkExampleDicomAppPlugin::~ctkExampleDicomAppPlugin()
 {
-  
+  qDebug()<< "delete applogic";
+  delete this->AppLogic;
+  this->AppLogic = 0;
 }
 
+//----------------------------------------------------------------------------
 void ctkExampleDicomAppPlugin::start(ctkPluginContext* context)
 {
-  instance = this;
-  this->context = context;
-  context->registerService(QStringList("ctkDicomAppInterface"), 
-    appLogic = new ctkExampleDicomAppLogic(ServiceAccessor<ctkDicomHostInterface>(context,"ctkDicomHostInterface")));
+  ctkExampleDicomAppPlugin::Context = context;
 
-  //ctkServiceReference serviceRef = context->getServiceReference("ctkDicomHostInterface");
-  //ctkDicomHostInterface*
-  //  serviceBinding = qobject_cast<ctkDicomHostInterface*>(context->getService(serviceRef));
+  delete this->AppLogic;
+  this->AppLogic = new ctkExampleDicomAppLogic();
+  context->registerService<ctkDicomAppInterface>(this->AppLogic);
 }
 
+//----------------------------------------------------------------------------
 void ctkExampleDicomAppPlugin::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
+  ctkExampleDicomAppPlugin::Context = 0;
 }
 
-ctkExampleDicomAppPlugin* ctkExampleDicomAppPlugin::getInstance()
+//----------------------------------------------------------------------------
+ctkPluginContext* ctkExampleDicomAppPlugin::getPluginContext()
 {
-  return instance;
-}
-
-ctkPluginContext* ctkExampleDicomAppPlugin::getPluginContext() const
-{
-  return context;
+  return ctkExampleDicomAppPlugin::Context;
 }
 
 Q_EXPORT_PLUGIN2(org_commontk_example_dicomapp, ctkExampleDicomAppPlugin)

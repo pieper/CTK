@@ -27,7 +27,7 @@ IF( DOXYGEN_FOUND )
       )
 
     SET(userdoc_output "${CMAKE_CURRENT_BINARY_DIR}/doc/html/index.html")
-    
+
     # Run doxygen as a custom command driven by a custom target.
     ADD_CUSTOM_COMMAND(
       OUTPUT ${userdoc_output}
@@ -37,17 +37,15 @@ IF( DOXYGEN_FOUND )
       )
 
     ADD_CUSTOM_TARGET(doc ${all_arg} DEPENDS ${userdoc_output})
-            
-#     ADD_CUSTOM_TARGET( doc ${all_arg}
-#       ${DOXYGEN_EXECUTABLE} ${CTK_BINARY_DIR}/Documentation/UserDoxyfile.txt 
-#       DEPENDS ${CTK_BINARY_DIR}/Documentation/UserDoxyfile.txt
-#       ) 
+    SET_TARGET_PROPERTIES(doc PROPERTIES LABELS Documentation)
 
     #
     # Dev documentation
     #
     SET( CTK_USER_DOCUMENTATION "YES" )
     SET( CTK_ADDITIONAL_EXCLUDE_PATTERN "" )
+    SET( CTK_ADDITIONAL_FILE_PATTERN "*.c \  *.cc \  *.cxx \  *.cpp \  *.c++ \  *.hxx \  *.hpp \  *.h++ \  *.txx \  *.C \  *.CC \  *.C++ \  *.moc" )
+
 
     CONFIGURE_FILE( Doxyfile.txt.in
       ${CMAKE_CURRENT_BINARY_DIR}/DevDoxyfile.txt
@@ -57,7 +55,8 @@ IF( DOXYGEN_FOUND )
       ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/DevDoxyfile.txt
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/DevDoxyfile.txt
       )
-    
+    SET_TARGET_PROPERTIES(doc-dev PROPERTIES LABELS Documentation)
+
   ELSE( DOXYGEN_DOT_FOUND )
     MESSAGE( WARNING
       "Warning: Dot not found - Documentation will not be created"

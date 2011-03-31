@@ -24,6 +24,8 @@
 
 
 /**
+ * \ingroup PluginFramework
+ *
  * Allows services to provide customized service objects in the plugin
  * environment.
  *
@@ -52,7 +54,7 @@
  * may concurrently call a <code>ctkServiceFactory</code>.
  *
  * @see ctkPluginContext#getService
- * @threadsafe
+ * @remarks This class is thread safe.
  */
 class ctkServiceFactory
 {

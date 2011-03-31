@@ -23,28 +23,25 @@
 #ifndef ctkDicomExchangeInterface_H
 #define ctkDicomExchangeInterface_H
 
-#include <QObject>
 #include <QRect>
-
+#include <QObject>
 #include "ctkDicomAppHostingTypes.h"
-#include <org_commontk_dah_core_Export.h>
 
-class org_commontk_dah_core_EXPORT ctkDicomExchangeInterface : public QObject
+struct QUuid;
+
+struct ctkDicomExchangeInterface
 {
-  Q_OBJECT
-
-public:
 
   // Data exchange interface methods
 
-  virtual bool notifyDataAvailable(ctkDicomAppHosting::AvailableData data, bool lastData) = 0;
+  virtual bool notifyDataAvailable(const ctkDicomAppHosting::AvailableData& data, bool lastData) = 0;
 
   virtual QList<ctkDicomAppHosting::ObjectLocator> getData(
-    QList<QUuid> objectUUIDs, 
-    QList<QString> acceptableTransferSyntaxUIDs, 
+    const QList<QUuid>& objectUUIDs,
+    const QList<QString>& acceptableTransferSyntaxUIDs,
     bool includeBulkData) = 0;
 
-  virtual void releaseData(QList<QUuid> objectUUIDs) = 0;
+  virtual void releaseData(const QList<QUuid>& objectUUIDs) = 0;
 
 //    8.3.3 getAsModels(objectUUIDs : ArrayOfUUID, classUID : UID, supportedInfosetTypes : ArrayOfMimeType) : ModelSetDescriptor	33
 //    8.3.4 queryModel(models : ArrayOfUUID, xpaths : ArrayOfString) : ArrayOfQueryResult	34
@@ -52,5 +49,7 @@ public:
 //    8.3.7 releaseModels(objectUUIDs : ArrayOfUUID): void
 
 };
+
+Q_DECLARE_INTERFACE(ctkDicomExchangeInterface, "org.commontk.dah.core.ExchangeInterface")
 
 #endif // ctkDicomExchangeInterface_H

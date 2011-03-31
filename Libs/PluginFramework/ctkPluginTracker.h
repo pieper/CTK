@@ -34,6 +34,8 @@ template<class T> class ctkTrackedPlugin;
 template<class T> class ctkPluginTrackerPrivate;
 
 /**
+ * \ingroup PluginFramework
+ *
  * The <code>ctkPluginTracker</code> class simplifies tracking plugins much like
  * the <code>ctkServiceTracker</code> simplifies tracking services.
  * <p>
@@ -57,7 +59,7 @@ template<class T> class ctkPluginTrackerPrivate;
  * \tparam T The type of the tracked object. The type must be an assignable
  *         datatype, provide a boolean conversion function, and provide
  *         a constructor and an assignment operator which can handle 0 as an argument.
- * \threadsafe
+ * \remarks This class is thread safe.
  */
 template<class T = QSharedPointer<ctkPlugin> >
 class ctkPluginTracker : protected ctkPluginTrackerCustomizer<T>
@@ -178,6 +180,25 @@ public:
    *         this <code>ctkPluginTracker</code> is not open.
    */
   virtual int getTrackingCount() const;
+
+  /**
+   * Return a <code>QMap</code> with the <code>ctkPlugin</code>s and customized
+   * objects for all plugins being tracked by this <code>ctkPluginTracker</code>.
+   *
+   * @return A <code>QMap</code> with the <code>ctkPlugin</code>s and customized
+   *         objects for all services being tracked by this
+   *         <code>ctkPluginTracker</code>. If no plugins are being tracked, then
+   *         the returned map is empty.
+   */
+  virtual QMap<QSharedPointer<ctkPlugin>, T> getTracked() const;
+
+  /**
+   * Return if this <code>ctkPluginTracker</code> is empty.
+   *
+   * @return <code>true</code> if this <code>ctkPluginTracker</code> is not tracking any
+   *         plugins.
+   */
+  virtual bool isEmpty() const;
 
 protected:
 

@@ -33,42 +33,63 @@
 
 #include <stdexcept>
 
+//----------------------------------------------------------------------------
 ctkServiceRegistration::ctkServiceRegistration()
   : d_ptr(0)
 {
 
 }
 
+//----------------------------------------------------------------------------
 ctkServiceRegistration::ctkServiceRegistration(const ctkServiceRegistration& reg)
   : d_ptr(reg.d_ptr)
 {
   d_func()->ref.ref();
 }
 
+//----------------------------------------------------------------------------
 ctkServiceRegistration::ctkServiceRegistration(ctkServiceRegistrationPrivate* registrationPrivate)
   : d_ptr(registrationPrivate)
 {
   d_func()->ref.ref();
 }
 
+//----------------------------------------------------------------------------
 ctkServiceRegistration::ctkServiceRegistration(ctkPluginPrivate* plugin, QObject* service,
-                    const ServiceProperties& props)
+                    const ctkDictionary& props)
   : d_ptr(new ctkServiceRegistrationPrivate(plugin, service, props))
 {
 
 }
 
+//----------------------------------------------------------------------------
 ctkServiceRegistration::operator bool() const
 {
   return d_func();
 }
 
+//----------------------------------------------------------------------------
+ctkServiceRegistration& ctkServiceRegistration::operator=(int null)
+{
+  if (null == 0)
+  {
+    if (d_func() && !d_func()->ref.deref())
+    {
+      delete d_ptr;
+    }
+    d_ptr = 0;
+  }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 ctkServiceRegistration::~ctkServiceRegistration()
 {
   if (d_func() && !d_func()->ref.deref())
     delete d_ptr;
 }
 
+//----------------------------------------------------------------------------
 ctkServiceReference ctkServiceRegistration::getReference() const
 {
   Q_D(const ctkServiceRegistration);
@@ -79,7 +100,8 @@ ctkServiceReference ctkServiceRegistration::getReference() const
   return d->reference;
 }
 
-void ctkServiceRegistration::setProperties(const ServiceProperties& props)
+//----------------------------------------------------------------------------
+void ctkServiceRegistration::setProperties(const ctkDictionary& props)
 {
   Q_D(ctkServiceRegistration);
   if (!d) throw std::logic_error("ctkServiceRegistration object invalid");
@@ -120,6 +142,7 @@ void ctkServiceRegistration::setProperties(const ServiceProperties& props)
       ctkServiceEvent(ctkServiceEvent::MODIFIED_ENDMATCH, d->reference));
 }
 
+//----------------------------------------------------------------------------
 void ctkServiceRegistration::unregister()
 {
   Q_D(ctkServiceRegistration);
@@ -170,7 +193,7 @@ void ctkServiceRegistration::unregister()
           }
           catch (const std::exception& ue)
           {
-            ctkPluginFrameworkEvent pfwEvent(ctkPluginFrameworkEvent::ERROR, d->plugin->q_func().data(), ue);
+            ctkPluginFrameworkEvent pfwEvent(ctkPluginFrameworkEvent::ERROR, d->plugin->q_func(), ue);
             d->plugin->fwCtx->listeners
                 .emitFrameworkEvent(pfwEvent);
           }
@@ -185,6 +208,7 @@ void ctkServiceRegistration::unregister()
   }
 }
 
+//----------------------------------------------------------------------------
 bool ctkServiceRegistration::operator<(const ctkServiceRegistration& o) const
 {
   Q_D(const ctkServiceRegistration);
@@ -192,12 +216,14 @@ bool ctkServiceRegistration::operator<(const ctkServiceRegistration& o) const
   return d->reference <(o.d_func()->reference);
 }
 
+//----------------------------------------------------------------------------
 bool ctkServiceRegistration::operator==(const ctkServiceRegistration& registration) const
 {
   Q_D(const ctkServiceRegistration);
   return d == registration.d_func();
 }
 
+//----------------------------------------------------------------------------
 ctkServiceRegistration& ctkServiceRegistration::operator=(const ctkServiceRegistration& registration)
 {
   ctkServiceRegistrationPrivate* curr_d = d_func();
@@ -210,6 +236,7 @@ ctkServiceRegistration& ctkServiceRegistration::operator=(const ctkServiceRegist
   return *this;
 }
 
+//----------------------------------------------------------------------------
 uint qHash(const ctkServiceRegistration& serviceReg)
 {
   return qHash(serviceReg.d_func());

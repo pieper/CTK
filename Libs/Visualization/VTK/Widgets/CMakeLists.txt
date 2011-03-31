@@ -1,16 +1,6 @@
 PROJECT(CTKVisualizationVTKWidgets)
 
 #
-# 3rd party dependencies
-#
-
-FIND_PACKAGE(VTK)
-IF(NOT VTK_FOUND)
-  MESSAGE(FATAL_ERROR "error: VTK package is required to build ${PROJECT_NAME}")
-ENDIF()
-INCLUDE(${VTK_USE_FILE})
-
-#
 # See CTK/CMake/ctkMacroBuildLib.cmake for details
 #
 
@@ -22,6 +12,9 @@ SET(KIT_SRCS
   ctkVTKAbstractMatrixWidget.cpp
   ctkVTKAbstractMatrixWidget.h
   ctkVTKAbstractMatrixWidget_p.h
+  ctkVTKAbstractView.cpp
+  ctkVTKAbstractView.h
+  ctkVTKAbstractView_p.h
   ctkVTKDataSetModel.cpp
   ctkVTKDataSetModel.h
   ctkVTKDataSetArrayComboBox.cpp
@@ -47,6 +40,8 @@ SET(KIT_SRCS
 # Headers that should run through moc
 SET(KIT_MOC_SRCS
   ctkVTKAbstractMatrixWidget_p.h
+  ctkVTKAbstractView.h
+  ctkVTKAbstractView_p.h
   ctkVTKDataSetArrayComboBox.h
   ctkVTKDataSetModel.h
   ctkVTKMatrixWidget.h
@@ -103,9 +98,9 @@ IF (${CTK_USE_CHARTS})
   ADD_DEFINITIONS(-DCTK_USE_CHARTS)
 ENDIF(${CTK_USE_CHARTS})
 
-# Target libraries - See CMake/ctkMacroGetTargetLibraries.cmake
+# Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
-ctkMacroGetTargetLibraries(KIT_target_libraries)
+ctkFunctionGetTargetLibraries(KIT_target_libraries)
 
 ctkMacroBuildLib(
   NAME ${PROJECT_NAME}

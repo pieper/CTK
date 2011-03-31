@@ -31,6 +31,8 @@ class QObject;
 class ctkPlugin;
 
 /**
+ * \ingroup PluginFramework
+ *
  * The <code>ctkPluginTrackerCustomizer</code> interface allows a
  * <code>ctkPluginTracker</code> to customize the <code>ctkPlugin</code>s that are
  * tracked. A <code>ctkPluginTrackerCustomizer</code> is called when a plugin is
@@ -55,7 +57,7 @@ class ctkPlugin;
  * thread-safe.
  *
  * \tparam T The type of the tracked object.
- * \threadsafe
+ * \remarks This class is thread safe.
  */
 template<class T>
 struct ctkPluginTrackerCustomizer {

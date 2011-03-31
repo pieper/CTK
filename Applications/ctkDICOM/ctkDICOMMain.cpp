@@ -23,13 +23,13 @@
 #include <QTreeView>
 #include <QSettings>
 #include <QDir>
-#include <QPushButton>
+#include <QResource>
 
 // CTK widget includes
-#include <ctkDICOMQueryRetrieveWidget.h>
+#include <ctkDICOMAppWidget.h>
 
 // ctkDICOMCore includes
-#include "ctkDICOM.h"
+#include "ctkDICOMDatabase.h"
 #include "ctkDICOMModel.h"
 #include "ctkDICOMIndexer.h"
 
@@ -49,17 +49,20 @@ int main(int argc, char** argv)
   app.setOrganizationDomain("commontk.org");
   app.setApplicationName("ctkDICOM");
 
+  // set up Qt resource files
+  QResource::registerResource("./Resources/ctkDICOM.qrc");
+
   QSettings settings;
   QString databaseDirectory;
 
   // set up the database 
   // - use command line argument if one is given, otherwise use default
   if (argc > 1)
-    {
+  {
     QString directory(argv[1]);
     settings.setValue("DatabaseDirectory", directory);
     settings.sync();
-    }
+  }
 
   if ( settings.value("DatabaseDirectory", "") == "" )
   {
@@ -81,40 +84,11 @@ int main(int argc, char** argv)
     }
   }
 
+  ctkDICOMAppWidget DICOMApp;
 
-  // load the database
-  QString databaseFileName = databaseDirectory + QString("/ctkDICOM.sql");
+  DICOMApp.setDatabaseDirectory(databaseDirectory);
+  DICOMApp.show();
+  DICOMApp.raise();
 
-  ctkDICOM myCTK;
-  try { myCTK.openDatabase( databaseFileName ); }
-  catch (std::exception e)
-  {
-    std::cerr << "Database error: " << qPrintable(myCTK.GetLastError()) << "\n";
-    myCTK.closeDatabase();
-    return EXIT_FAILURE;
-  }
-
-  // set up the data model for the database
-  // - this is a map from sql database to qt callable representation
-  ctkDICOMModel model;
-  model.setDatabase(myCTK.database());
-  
-  // create the query/retrieve widget
-  // - associate the tree view with the database model
-  ctkDICOMQueryRetrieveWidget queryRetrieve;
-  QTreeView *treeView = queryRetrieve.findChild<QTreeView *>("treeView");
-  if (!treeView)
-    {
-    std::cerr << "Could not access tree view from QueryRetrieve widget\n";
-    return EXIT_FAILURE;
-    }
-  treeView->setModel(&model);
-
-  // connect the Add button for the local database
-  QPushButton *addButton = queryRetrieve.findChild<QPushButton *>("addToDatabase");
-  //TODO: this should be moved into the ctkLibrary widget: connect(addButton, SIGNAL("clicked()"), this
-
-  queryRetrieve.show();
-  queryRetrieve.raise();
   return app.exec();
 }

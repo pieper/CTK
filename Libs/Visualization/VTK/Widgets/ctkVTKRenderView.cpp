@@ -43,16 +43,12 @@ static ctkLogger logger("org.commontk.visualization.vtk.widgets.ctkVTKRenderView
 
 // --------------------------------------------------------------------------
 ctkVTKRenderViewPrivate::ctkVTKRenderViewPrivate(ctkVTKRenderView& object)
-  :q_ptr(&object)
+  :ctkVTKAbstractViewPrivate(object)
 {
   qRegisterMetaType<ctkAxesWidget::Axis>("ctkAxesWidget::Axis");
   this->Renderer = vtkSmartPointer<vtkRenderer>::New();
-  this->RenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
   this->Axes = vtkSmartPointer<vtkAxesActor>::New();
   this->Orientation = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
-  this->CornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-  this->RenderPending = false;
-  this->RenderEnabled = true;
   this->ZoomFactor = 0.05;
   this->PitchRollYawIncrement = 5;
   this->PitchDirection = ctkVTKRenderView::PitchUp;
@@ -65,48 +61,32 @@ ctkVTKRenderViewPrivate::ctkVTKRenderViewPrivate(ctkVTKRenderView& object)
   this->RockEnabled = false;
   this->RockIncrement = 0;
   this->RockLength = 200;
+
+  this->Orientation->SetOrientationMarker(this->Axes);
 }
 
 // --------------------------------------------------------------------------
 void ctkVTKRenderViewPrivate::setupCornerAnnotation()
 {
   logger.trace("setupCornerAnnotation");
+  this->ctkVTKAbstractViewPrivate::setupCornerAnnotation();
   if (!this->Renderer->HasViewProp(this->CornerAnnotation))
     {
     this->Renderer->AddViewProp(this->CornerAnnotation);
-    this->CornerAnnotation->SetMaximumLineHeight(0.07);
-    vtkTextProperty *tprop = this->CornerAnnotation->GetTextProperty();
-    tprop->ShadowOn();
     }
-  this->CornerAnnotation->ClearAllTexts();
 }
 
 //---------------------------------------------------------------------------
 void ctkVTKRenderViewPrivate::setupRendering()
 {
-  logger.trace("setupRendering");
-  Q_ASSERT(this->RenderWindow);
-  this->RenderWindow->SetAlphaBitPlanes(1);
-  this->RenderWindow->SetMultiSamples(0);
-  this->RenderWindow->StereoCapableWindowOn();
-  
-  this->RenderWindow->GetRenderers()->RemoveAllItems();
-  
   // Add renderer
   this->RenderWindow->AddRenderer(this->Renderer);
-  
-  // Setup the corner annotation
-  this->setupCornerAnnotation();
-
-  this->VTKWidget->SetRenderWindow(this->RenderWindow);
-}
-
-//---------------------------------------------------------------------------
-void ctkVTKRenderViewPrivate::setupDefaultInteractor()
-{
-  logger.trace("setupDefaultInteractor");
-  Q_Q(ctkVTKRenderView);
-  q->setInteractor(this->RenderWindow->GetInteractor());
+  this->ctkVTKAbstractViewPrivate::setupRendering();
+  // The interactor in RenderWindow exists after the renderwindow is set to
+  // the QVTKWidet
+  this->Orientation->SetInteractor(this->RenderWindow->GetInteractor());
+  this->Orientation->SetEnabled(1);
+  this->Orientation->InteractiveOff();
 }
 
 //----------------------------------------------------------------------------
@@ -222,111 +202,24 @@ void ctkVTKRenderViewPrivate::doRock()
 // ctkVTKRenderView methods
 
 // --------------------------------------------------------------------------
-ctkVTKRenderView::ctkVTKRenderView(QWidget* _parent) : Superclass(_parent)
-  , d_ptr(new ctkVTKRenderViewPrivate(*this))
+ctkVTKRenderView::ctkVTKRenderView(QWidget* parentWidget)
+  : Superclass(new ctkVTKRenderViewPrivate(*this), parentWidget)
 {
   Q_D(ctkVTKRenderView);
-  
-  d->VTKWidget = new QVTKWidget(this);
-  this->setLayout(new QVBoxLayout);
-  this->layout()->setMargin(0);
-  this->layout()->setSpacing(0);
-  this->layout()->addWidget(d->VTKWidget);
-
-  d->setupRendering();
-  d->setupDefaultInteractor();
+  d->init();
 }
 
 //----------------------------------------------------------------------------
 ctkVTKRenderView::~ctkVTKRenderView()
 {
 }
-
-//----------------------------------------------------------------------------
-void ctkVTKRenderView::scheduleRender()
-{
-  Q_D(ctkVTKRenderView);
-
-  logger.trace(QString("scheduleRender - RenderEnabled: %1 - RenderPending: %2").
-               arg(d->RenderEnabled ? "true" : "false")
-               .arg(d->RenderPending ? "true:" : "false"));
-
-  if (!d->RenderEnabled)
-    {
-    return;
-    }
-  if (!d->RenderPending)
-    {
-    d->RenderPending = true;
-    QTimer::singleShot(0, this, SLOT(forceRender()));
-    }
-}
-
-//----------------------------------------------------------------------------
-void ctkVTKRenderView::forceRender()
-{
-  Q_D(ctkVTKRenderView);
-
-  logger.trace(QString("forceRender - RenderEnabled: %1")
-               .arg(d->RenderEnabled ? "true" : "false"));
-
-  if (!d->RenderEnabled || !this->isVisible())
-    {
-    return;
-    }
-  d->RenderWindow->Render();
-  d->RenderPending = false;
-}
-
-//----------------------------------------------------------------------------
-CTK_GET_CPP(ctkVTKRenderView, vtkRenderWindow*, renderWindow, RenderWindow);
-
-//----------------------------------------------------------------------------
-CTK_GET_CPP(ctkVTKRenderView, vtkRenderWindowInteractor*, interactor, CurrentInteractor);
-
 //----------------------------------------------------------------------------
 void ctkVTKRenderView::setInteractor(vtkRenderWindowInteractor* newInteractor)
 {
   Q_D(ctkVTKRenderView);
-
   logger.trace("setInteractor");
-
-  d->RenderWindow->SetInteractor(newInteractor);
-  d->Orientation->SetOrientationMarker(d->Axes);
+  this->Superclass::setInteractor(newInteractor);
   d->Orientation->SetInteractor(newInteractor);
-  d->Orientation->SetEnabled(1);
-  d->Orientation->InteractiveOff();
-  d->CurrentInteractor = newInteractor; 
-}
-
-//----------------------------------------------------------------------------
-vtkInteractorObserver* ctkVTKRenderView::interactorStyle()
-{
-  Q_D(ctkVTKRenderView);
-  if (d->CurrentInteractor)
-    {
-    return d->CurrentInteractor->GetInteractorStyle();
-    }
-  else
-    {
-    return 0;
-    }
-}
-
-//----------------------------------------------------------------------------
-void ctkVTKRenderView::setCornerAnnotationText(const QString& text)
-{
-  Q_D(ctkVTKRenderView);
-  logger.trace(QString("setCornerAnnotationText: %1").arg(text));
-  d->CornerAnnotation->ClearAllTexts();
-  d->CornerAnnotation->SetText(2, text.toLatin1());
-}
-
-//----------------------------------------------------------------------------
-QString ctkVTKRenderView::cornerAnnotationText() const
-{
-  Q_D(const ctkVTKRenderView);
-  return QLatin1String(d->CornerAnnotation->GetText(2));
 }
 
 // --------------------------------------------------------------------------
@@ -388,10 +281,6 @@ void ctkVTKRenderView::resetCamera()
 
 //----------------------------------------------------------------------------
 CTK_GET_CPP(ctkVTKRenderView, vtkRenderer*, renderer, Renderer);
-
-//----------------------------------------------------------------------------
-CTK_SET_CPP(ctkVTKRenderView, bool, setRenderEnabled, RenderEnabled);
-CTK_GET_CPP(ctkVTKRenderView, bool, renderEnabled, RenderEnabled);
 
 //----------------------------------------------------------------------------
 CTK_GET_CPP(ctkVTKRenderView, int, pitchRollYawIncrement, PitchRollYawIncrement);

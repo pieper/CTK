@@ -7,12 +7,15 @@ SET(TEST_SOURCES
   ctkVTKDataSetArrayComboBoxTest1.cpp
   ctkVTKDataSetModelTest1.cpp
   ctkVTKMatrixWidgetTest1.cpp
+  ctkVTKScalarBarWidgetTest1.cpp
   ctkTransferFunctionBarsItemTest1.cpp
   ctkTransferFunctionViewTest1.cpp
   ctkTransferFunctionViewTest2.cpp
   ctkTransferFunctionViewTest3.cpp
   ctkTransferFunctionViewTest4.cpp
   ctkTransferFunctionViewTest5.cpp
+  ctkVTKRenderViewTest1.cpp
+  ctkVTKSliceViewTest1.cpp
   ctkVTKSurfaceMaterialPropertyWidgetTest1.cpp
   ctkVTKTextPropertyWidgetTest1.cpp
   ctkVTKThumbnailViewTest1.cpp
@@ -34,8 +37,8 @@ ENDIF(CTK_USE_CHARTS)
 #
 IF(EXISTS "${CTKData_DIR}")
   LIST(APPEND TEST_SOURCES
-    ctkVTKSliceViewTest1.cpp
-    ctkVTKRenderViewTest1.cpp
+    ctkVTKSliceViewTest2.cpp
+    ctkVTKRenderViewTest2.cpp
     )
 ENDIF()
 
@@ -66,6 +69,7 @@ ENDMACRO( SIMPLE_TEST  )
 SIMPLE_TEST( ctkVTKDataSetArrayComboBoxTest1 )
 SIMPLE_TEST( ctkVTKDataSetModelTest1 )
 SIMPLE_TEST( ctkVTKMatrixWidgetTest1 )
+SIMPLE_TEST( ctkVTKScalarBarWidgetTest1 )
 SIMPLE_TEST( ctkTransferFunctionBarsItemTest1 )
 SIMPLE_TEST( ctkTransferFunctionViewTest1 )
 SIMPLE_TEST( ctkTransferFunctionViewTest2 )
@@ -80,6 +84,8 @@ IF (CTK_USE_CHARTS)
   SIMPLE_TEST( ctkVTKScalarsToColorsViewTest4 )
   SIMPLE_TEST( ctkVTKScalarsToColorsWidgetTest1 )
 ENDIF(CTK_USE_CHARTS)
+SIMPLE_TEST( ctkVTKRenderViewTest1 )
+SIMPLE_TEST( ctkVTKSliceViewTest1 )
 SIMPLE_TEST( ctkVTKSurfaceMaterialPropertyWidgetTest1 )
 SIMPLE_TEST( ctkVTKTextPropertyWidgetTest1 )
 SIMPLE_TEST( ctkVTKThumbnailViewTest1 )
@@ -89,6 +95,7 @@ SIMPLE_TEST( ctkVTKThumbnailViewTest1 )
 #
 IF(EXISTS "${CTKData_DIR}")
   #
-  SIMPLE_TEST( ctkVTKSliceViewTest1 )
-  SIMPLE_TEST( ctkVTKRenderViewTest1 )
+  SIMPLE_TEST( ctkVTKSliceViewTest2 )
+  SIMPLE_TEST( ctkVTKRenderViewTest2 )
 ENDIF()
+

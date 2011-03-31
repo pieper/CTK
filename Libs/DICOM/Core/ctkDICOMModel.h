@@ -32,10 +32,25 @@ class CTK_DICOM_CORE_EXPORT ctkDICOMModel : public QAbstractItemModel
 {
   Q_OBJECT
 public:
+
+  enum {
+    UIDRole = Qt::UserRole,
+    TypeRole
+  };
+
+  enum IndexType{
+    RootType,
+    PatientType,
+    StudyType,
+    SeriesType,
+    ImageType
+  };
+
   explicit ctkDICOMModel(QObject* parent = 0);
   virtual ~ctkDICOMModel();
 
   void setDatabase(const QSqlDatabase& dataBase);
+
 
   virtual bool canFetchMore ( const QModelIndex & parent ) const;
   virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
@@ -49,10 +64,12 @@ public:
   virtual QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
   virtual QModelIndex parent ( const QModelIndex & index ) const;
   virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
+  virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
   virtual bool setHeaderData ( int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole );
   // Sorting resets the model because fetched/unfetched items could disappear/appear respectively.
   virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
-
+public slots:
+  virtual void reset();
 protected:
   QScopedPointer<ctkDICOMModelPrivate> d_ptr;
 

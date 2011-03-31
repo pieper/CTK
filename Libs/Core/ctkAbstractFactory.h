@@ -34,6 +34,7 @@
 #endif
 
 //----------------------------------------------------------------------------
+/// \ingroup Core
 /// ctkAbstractFactoryItem is the base class of factory items. They are
 /// uniquely defined by a key and are responsible for creating/holding an
 /// instance of a BaseClassType object.
@@ -41,7 +42,8 @@ template<typename BaseClassType>
 class ctkAbstractFactoryItem
 {
 public:
-  explicit ctkAbstractFactoryItem();
+  //explicit ctkAbstractFactoryItem();
+  ctkAbstractFactoryItem();
   
   virtual QString loadErrorString()const;
   virtual bool load() = 0;
@@ -63,9 +65,10 @@ private:
 };
 
 //----------------------------------------------------------------------------
+/// \ingroup Core
 /// \brief ctkAbstractFactory is the base class of all the factory where items need
 /// to be registered before being instantiated.
-/// \paragraph ctkAbstractFactory contains a collection of ctkAbstractFactoryItems that
+/// <p> ctkAbstractFactory contains a collection of ctkAbstractFactoryItems that
 /// are uniquely identifyed by a key. Subclasses of ctkAbstractFactory are
 /// responsible for populating the list of ctkAbstractFactoryItems.
 /// BaseClassType could be any type (most probably a QObject) 
@@ -73,9 +76,10 @@ template<typename BaseClassType>
 class ctkAbstractFactory
 {
 public:
+  typedef QHash<QString, QSharedPointer<ctkAbstractFactoryItem<BaseClassType> > > HashType;
 
   /// Constructor/Desctructor
-  explicit ctkAbstractFactory();
+  ctkAbstractFactory();
   virtual ~ctkAbstractFactory();
   virtual void printAdditionalInfo();
 
@@ -103,6 +107,9 @@ public:
   void setVerbose(bool value);
   bool verbose()const;
 
+  void setRegisteredItems(const QSharedPointer<HashType>& items);
+  QSharedPointer<HashType> registeredItems();
+
 protected:
 
   /// \brief Call the load method associated with the item.
@@ -112,14 +119,15 @@ protected:
   /// Get a Factory item given its itemKey. Return 0 if any.
   ctkAbstractFactoryItem<BaseClassType> * item(const QString& itemKey)const;
 
-  typedef typename QHash<QString, QSharedPointer<ctkAbstractFactoryItem<BaseClassType> > >::const_iterator ConstIterator;
-  typedef typename QHash<QString, QSharedPointer<ctkAbstractFactoryItem<BaseClassType> > >::iterator       Iterator;
+  typedef typename HashType::const_iterator ConstIterator;
+  typedef typename HashType::iterator       Iterator;
 
 private:
+  /*
   ctkAbstractFactory(const ctkAbstractFactory &); /// Not implemented
   void operator=(const ctkAbstractFactory&); /// Not implemented
-
-  QHash<QString, QSharedPointer<ctkAbstractFactoryItem<BaseClassType> > > RegisteredItemMap;
+  */
+  QSharedPointer<HashType> RegisteredItemMap;
 
   bool Verbose;
 };

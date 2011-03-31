@@ -24,6 +24,7 @@
 
 #include <QSharedDataPointer>
 #include <QDebug>
+#include <QMetaType>
 
 #include "ctkPluginFrameworkExport.h"
 
@@ -31,7 +32,16 @@
 
 class ctkServiceEventData;
 
+#ifdef REGISTERED
+#error Try to reorder include files (this one first)\
+ or write #undef REGISTERED before including this header.\
+ Cause of this problem may be dcmimage.h, which indirectly\
+ includes windows.h.
+#endif
+
 /**
+ * \ingroup PluginFramework
+ *
  * An event from the Plugin Framework describing a service lifecycle change.
  * <p>
  * <code>ctkServiceEvent</code> objects are delivered to
@@ -122,10 +132,10 @@ public:
    * Creates a new service event object.
    *
    * @param type The event type.
-   * @param reference A <code>ServiceReference</code> object to the service
+   * @param reference A <code>ctkServiceReference</code> object to the service
    *        that had a lifecycle change.
    */
-  ctkServiceEvent(Type type, const ctkServiceReference& plugin);
+  ctkServiceEvent(Type type, const ctkServiceReference& reference);
 
   ctkServiceEvent(const ctkServiceEvent& other);
 
@@ -156,7 +166,14 @@ public:
 
 };
 
+Q_DECLARE_METATYPE(ctkServiceEvent)
+
+/**
+ * \ingroup PluginFramework
+ * @{
+ */
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug dbg, ctkServiceEvent::Type type);
 CTK_PLUGINFW_EXPORT QDebug operator<<(QDebug dbg, const ctkServiceEvent& event);
+/** @}*/
 
 #endif // CTKSERVICEEVENT_H

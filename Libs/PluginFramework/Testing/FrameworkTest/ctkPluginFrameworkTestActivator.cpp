@@ -30,9 +30,10 @@
 #include <QtPlugin>
 #include <QStringList>
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkTestActivator::start(ctkPluginContext* context)
 {
-  ServiceProperties props;
+  ctkDictionary props;
 
   frameworkTestSuite = new ctkPluginFrameworkTestSuite(context);
   props.clear();
@@ -44,6 +45,7 @@ void ctkPluginFrameworkTestActivator::start(ctkPluginContext* context)
   context->registerService<ctkTestSuiteInterface>(serviceListenerTestSuite, props);
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkTestActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context);

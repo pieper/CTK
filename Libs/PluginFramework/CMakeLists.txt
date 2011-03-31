@@ -10,12 +10,14 @@ SET(KIT_export_directive "CTK_PLUGINFW_EXPORT")
 # Source files
 SET(KIT_SRCS
   ctkCaseInsensitiveString.cpp
+  ctkDictionary.cpp
   ctkLDAPExpr.cpp
   ctkLDAPExpr_p.h
   ctkLDAPSearchFilter.cpp
   ctkPlugin.cpp
   ctkPluginAbstractTracked_p.h
   ctkPluginAbstractTracked.tpp
+  ctkPluginActivator.h
   ctkPluginArchive.cpp
   ctkPluginArchive_p.h
   ctkPluginConstants.cpp
@@ -32,12 +34,14 @@ SET(KIT_SRCS
   ctkPluginFrameworkContext.cpp
   ctkPluginFrameworkContext_p.h
   ctkPluginFrameworkEvent.cpp
+  ctkPluginFrameworkLauncher.cpp
   ctkPluginFrameworkListeners.cpp
   ctkPluginFrameworkListeners_p.h
   ctkPluginFrameworkPrivate.cpp
   ctkPluginFrameworkPrivate_p.h
   ctkPluginFrameworkUtil.cpp
   ctkPluginFrameworkUtil_p.h
+  ctkPluginLocalization.cpp
   ctkPluginManifest.cpp
   ctkPluginManifest_p.h
   ctkPluginPrivate.cpp
@@ -79,11 +83,6 @@ SET(KIT_SRCS
   ctkVersionRange.cpp
   ctkVersionRange_p.h
 
-  # EventBus sources
-  EventBus/ctkEvent.cpp
-  EventBus/ctkEventBus.h
-  EventBus/ctkEventConstants.cpp
-
   # Services
   service/cm/ctkConfiguration.cpp
   service/cm/ctkConfigurationAdmin.cpp
@@ -94,11 +93,22 @@ SET(KIT_SRCS
   service/cm/ctkManagedService.h
   service/cm/ctkManagedServiceFactory.h
 
+  service/event/ctkEvent.cpp
+  service/event/ctkEventAdmin.h
+  service/event/ctkEventConstants.cpp
+  service/event/ctkEventHandler.h
+
   service/log/ctkLogEntry.h
   service/log/ctkLogListener.h
   service/log/ctkLogReaderService.h
   service/log/ctkLogService.cpp
   service/log/ctkLogStream.cpp
+
+  service/metatype/ctkAttributeDefinition.cpp
+  service/metatype/ctkMetaTypeInformation.h
+  service/metatype/ctkMetaTypeProvider.cpp
+  service/metatype/ctkMetaTypeService.cpp
+  service/metatype/ctkObjectClassDefinition.h
   )
 
 # Headers that should run through moc
@@ -123,13 +133,14 @@ ctkFunctionGeneratePluginManifest(KIT_SRCS
   VERSION "0.9.9"
   )
 
-# Target libraries - See CMake/ctkMacroGetTargetLibraries.cmake
+# Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
-ctkMacroGetTargetLibraries(KIT_target_libraries)
+ctkFunctionGetTargetLibraries(KIT_target_libraries)
 
 ctkMacroBuildLib(
   NAME ${PROJECT_NAME}
   EXPORT_DIRECTIVE ${KIT_export_directive}
+  INCLUDE_DIRECTORIES ${CTK_SUPERBUILD_BINARY_DIR}
   SRCS ${KIT_SRCS}
   MOC_SRCS ${KIT_MOC_SRCS}
   UI_FORMS ${KIT_UI_FORMS}

@@ -7,6 +7,7 @@ CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cxx
   ctkButtonGroupTest1.cpp
   ctkCheckBoxPixmapsTest1.cpp
   ctkCheckableHeaderViewTest1.cpp
+  ctkCheckableHeaderViewTest2.cpp
   ctkCheckablePushButtonTest1.cpp
   ctkCollapsibleButtonTest1.cpp
   ctkCollapsibleGroupBoxTest1.cpp
@@ -15,7 +16,7 @@ CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cxx
   ctkColorPickerButtonTest1.cpp
   ctkComboBoxTest1.cpp
   ctkConfirmExitDialogTest1.cpp
-  ctkConsoleWidgetTest1.cpp
+  ctkConsoleTest1.cpp
   ctkCoordinatesWidgetTest1.cpp
   ctkDirectoryButtonTest1.cpp
   ctkDoubleRangeSliderTest1.cpp
@@ -23,19 +24,24 @@ CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cxx
   ctkDoubleSliderTest1.cpp
   ctkDynamicSpacerTest1.cpp
   ctkDynamicSpacerTest2.cpp
+  ctkErrorLogWidgetTest1.cpp
   ctkFileDialogTest1.cpp
   ctkFittedTextBrowserTest1.cpp
+  ctkFlowLayoutTest1.cpp
   ctkFontButtonTest1.cpp
+  ctkLayoutManagerTest1.cpp
   ctkMaterialPropertyPreviewLabelTest1.cpp
   ctkMaterialPropertyWidgetTest1.cpp
   ctkMatrixWidgetTest1.cpp
   ctkMatrixWidgetTest2.cpp
   ctkMenuButtonTest1.cpp
+  ctkModalityWidgetTest1.cpp
   ctkPathLineEditTest1.cpp
   ctkRangeSliderTest1.cpp
   ctkRangeWidgetTest1.cpp
   ctkRangeWidgetTest2.cpp
   ctkDateRangeWidgetTest1.cpp
+  ctkScreenshotDialogTest1.cpp
   ctkSettingsPanelTest1.cpp
   ctkSettingsTest1.cpp
   ctkSettingsDialogTest1.cpp
@@ -88,6 +94,7 @@ SIMPLE_TEST( ctkAxesWidgetTest1 )
 SIMPLE_TEST( ctkButtonGroupTest1 )
 SIMPLE_TEST( ctkCheckBoxPixmapsTest1 )
 SIMPLE_TEST( ctkCheckableHeaderViewTest1 )
+SIMPLE_TEST( ctkCheckableHeaderViewTest2 )
 SIMPLE_TEST( ctkCheckablePushButtonTest1 )
 SIMPLE_TEST( ctkCollapsibleButtonTest1 )
 SIMPLE_TEST( ctkCollapsibleGroupBoxTest1 )
@@ -96,7 +103,7 @@ SIMPLE_TEST( ctkColorDialogTest2 )
 SIMPLE_TEST( ctkColorPickerButtonTest1 )
 SIMPLE_TEST( ctkComboBoxTest1 )
 SIMPLE_TEST( ctkConfirmExitDialogTest1 )
-SIMPLE_TEST( ctkConsoleWidgetTest1 )
+SIMPLE_TEST( ctkConsoleTest1 )
 SIMPLE_TEST( ctkCoordinatesWidgetTest1 )
 SIMPLE_TEST( ctkDateRangeWidgetTest1 )
 SIMPLE_TEST( ctkDirectoryButtonTest1 )
@@ -105,20 +112,25 @@ SIMPLE_TEST( ctkDoubleRangeSliderTest2 )
 SIMPLE_TEST( ctkDoubleSliderTest1 )
 SIMPLE_TEST( ctkDynamicSpacerTest1 )
 SIMPLE_TEST( ctkDynamicSpacerTest2 )
+SIMPLE_TEST( ctkErrorLogWidgetTest1 )
 SIMPLE_TEST( ctkExampleUseOfWorkflowWidgetUsingDerivedSteps )
 SIMPLE_TEST( ctkExampleUseOfWorkflowWidgetUsingSignalsAndSlots )
 SIMPLE_TEST( ctkFileDialogTest1 )
 SIMPLE_TEST( ctkFittedTextBrowserTest1 )
+SIMPLE_TEST( ctkFlowLayoutTest1 )
 SIMPLE_TEST( ctkFontButtonTest1 )
+SIMPLE_TEST( ctkLayoutManagerTest1 )
 SIMPLE_TEST( ctkMaterialPropertyPreviewLabelTest1 )
 SIMPLE_TEST( ctkMaterialPropertyWidgetTest1 )
 SIMPLE_TEST( ctkMatrixWidgetTest1 )
 SIMPLE_TEST( ctkMatrixWidgetTest2 )
 SIMPLE_TEST( ctkMenuButtonTest1 )
+SIMPLE_TEST( ctkModalityWidgetTest1 )
 SIMPLE_TEST( ctkPathLineEditTest1 )
 SIMPLE_TEST( ctkRangeSliderTest1 )
 SIMPLE_TEST( ctkRangeWidgetTest1 )
 SIMPLE_TEST( ctkRangeWidgetTest2 )
+SIMPLE_TEST( ctkScreenshotDialogTest1 )
 SIMPLE_TEST( ctkSettingsDialogTest1 )
 SIMPLE_TEST( ctkSettingsPanelTest1 )
 SIMPLE_TEST( ctkSettingsTest1 )

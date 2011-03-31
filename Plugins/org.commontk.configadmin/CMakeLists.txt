@@ -17,6 +17,8 @@ SET(PLUGIN_SRCS
   ctkConfigurationAdminFactory_p.h
   ctkConfigurationAdminImpl.cpp
   ctkConfigurationAdminImpl_p.h
+  ctkConfigurationEventAdapter_p.h
+  ctkConfigurationEventAdapter.cpp
   ctkConfigurationImpl.cpp
   ctkConfigurationImpl_p.h
   ctkConfigurationStore.cpp
@@ -33,6 +35,7 @@ SET(PLUGIN_MOC_SRCS
   ctkConfigurationAdminActivator_p.h
   ctkConfigurationAdminFactory_p.h
   ctkConfigurationAdminImpl_p.h
+  ctkConfigurationEventAdapter_p.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -44,7 +47,7 @@ SET(PLUGIN_resources
 )
 
 #Compute the plugin dependencies
-ctkMacroGetTargetLibraries(PLUGIN_target_libraries)
+ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 
 ctkMacroBuildPlugin(
   NAME ${PROJECT_NAME}

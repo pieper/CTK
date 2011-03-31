@@ -27,6 +27,8 @@
 
 
 /**
+ * \ingroup PluginFramework
+ *
  * The <code>ctkServiceTrackerCustomizer</code> interface allows a
  * <code>ctkServiceTracker</code> to customize the service objects that are
  * tracked. A <code>ctkServiceTrackerCustomizer</code> is called when a service is
@@ -53,7 +55,7 @@
  * thread-safe.
  *
  * \tparam T The type of the tracked object.
- * \threadsafe
+ * \remarks This class is thread safe.
  */
 template<class T = QObject*>
 struct ctkServiceTrackerCustomizer {

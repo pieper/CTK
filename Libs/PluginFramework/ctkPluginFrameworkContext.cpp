@@ -27,11 +27,11 @@
 #include "ctkPluginConstants.h"
 #include "ctkServices_p.h"
 
-
+//----------------------------------------------------------------------------
 QMutex ctkPluginFrameworkContext::globalFwLock;
 int ctkPluginFrameworkContext::globalId = 1;
 
-
+//----------------------------------------------------------------------------
 ctkPluginFrameworkContext::ctkPluginFrameworkContext(
     const ctkProperties& initProps)
       : plugins(0), services(0), systemPlugin(new ctkPluginFramework()),
@@ -47,6 +47,7 @@ ctkPluginFrameworkContext::ctkPluginFrameworkContext(
   log() << "created";
 }
 
+//----------------------------------------------------------------------------
 ctkPluginFrameworkContext::~ctkPluginFrameworkContext()
 {
   if (initialized)
@@ -55,12 +56,14 @@ ctkPluginFrameworkContext::~ctkPluginFrameworkContext()
   }
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkContext::initProperties()
 {
   props[ctkPluginConstants::FRAMEWORK_VERSION] = "0.9";
   props[ctkPluginConstants::FRAMEWORK_VENDOR] = "CommonTK";
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkContext::init()
 {
   log() << "initializing";
@@ -91,12 +94,13 @@ void ctkPluginFrameworkContext::init()
   for (int i = 0; i < allPAs.size(); ++i)
   {
     ctkPluginArchive* pa = allPAs[i];
-    ctkPlugin* plugin = plugins->getPlugin(pa->getPluginLocation().toString());
+    QSharedPointer<ctkPlugin> plugin = plugins->getPlugin(pa->getPluginLocation().toString());
     log() << " #" << plugin->getPluginId() << " " << plugin->getSymbolicName() << ":"
         << plugin->getVersion() << " location:" << plugin->getLocation();
   }
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkContext::uninit()
 {
   if (!initialized) return;
@@ -119,16 +123,19 @@ void ctkPluginFrameworkContext::uninit()
   initialized = false;
 }
 
+//----------------------------------------------------------------------------
 int ctkPluginFrameworkContext::getId() const
 {
   return id;
 }
 
+//----------------------------------------------------------------------------
 QFileInfo ctkPluginFrameworkContext::getDataStorage(long id)
 {
   return QFileInfo(dataStorage, QString::number(id));
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkContext::checkOurPlugin(ctkPlugin* plugin) const
 {
   ctkPluginPrivate* pp = plugin->d_func();
@@ -138,6 +145,7 @@ void ctkPluginFrameworkContext::checkOurPlugin(ctkPlugin* plugin) const
   }
 }
 
+//----------------------------------------------------------------------------
 QDebug ctkPluginFrameworkContext::log() const
 {
   QDebug dbg(qDebug());
@@ -145,6 +153,7 @@ QDebug ctkPluginFrameworkContext::log() const
   return dbg;
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkContext::resolvePlugin(ctkPluginPrivate* plugin)
 {
   qDebug() << "resolve:" << plugin->symbolicName << "[" << plugin->id << "]";
@@ -154,7 +163,7 @@ void ctkPluginFrameworkContext::resolvePlugin(ctkPluginPrivate* plugin)
   if (tempResolved.size() > 0 && !tempResolved.contains(plugin))
   {
     ctkPluginException pe("resolve: InternalError1!", ctkPluginException::RESOLVE_ERROR);
-    listeners.frameworkError(plugin->q_func().data(), pe);
+    listeners.frameworkError(plugin->q_func(), pe);
     throw pe;
   }
 
@@ -168,6 +177,7 @@ void ctkPluginFrameworkContext::resolvePlugin(ctkPluginPrivate* plugin)
   qDebug() << "resolve: Done for" << plugin->symbolicName << "[" << plugin->id << "]";
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkContext::checkRequirePlugin(ctkPluginPrivate *plugin)
 {
   if (!plugin->require.isEmpty())
@@ -210,6 +220,7 @@ void ctkPluginFrameworkContext::checkRequirePlugin(ctkPluginPrivate *plugin)
   }
 }
 
+//----------------------------------------------------------------------------
 void ctkPluginFrameworkContext::deleteFWDir()
 {
   QString d = ctkPluginFrameworkUtil::getFrameworkDir(this);

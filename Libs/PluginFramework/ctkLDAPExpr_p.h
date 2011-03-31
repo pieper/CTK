@@ -23,7 +23,7 @@ limitations under the License.
 #define CTKLDAPEXPR_P_H
 
 #include "ctkPluginConstants.h"
-#include "ctkPluginFramework_global.h"
+#include "ctkDictionary.h"
 
 #include <QString>
 #include <QHash>
@@ -36,6 +36,7 @@ limitations under the License.
 class ctkLDAPExprData;
 
 /**
+\ingroup PluginFramework
 \brief LDAP Expression
 \date 19 May 2010
 \author Xavi Planes
@@ -66,7 +67,7 @@ public:
   ctkLDAPExpr();
 
   //!
-  ctkLDAPExpr(const QString &filter) throw ( std::invalid_argument );
+  ctkLDAPExpr(const QString &filter);
 
   //!
   ctkLDAPExpr(const ctkLDAPExpr& other);
@@ -120,8 +121,7 @@ public:
   bool isNull() const;
 
   //! 
-  static bool query(const QString &filter, const ctkDictionary &pd)
-      throw (std::invalid_argument);
+  static bool query(const QString &filter, const ctkDictionary &pd);
 
   //! Evaluate this LDAP filter.
   bool evaluate(const ctkDictionary &p, bool matchCase) const;
@@ -141,12 +141,10 @@ private:
   ctkLDAPExpr(int op, const QString &attrName, const QString &attrValue);
 
   //!
-  static ctkLDAPExpr parseExpr(ParseState &ps)
-    throw (std::invalid_argument);
+  static ctkLDAPExpr parseExpr(ParseState &ps);
 
   //!
-  static ctkLDAPExpr parseSimple(ParseState &ps)
-    throw (std::invalid_argument);
+  static ctkLDAPExpr parseSimple(ParseState &ps);
 
   //!
   bool compare(const QVariant &obj, int op, const QString &s) const;

@@ -23,22 +23,17 @@
 #ifndef CTKDICOMAPPINTERFACE_H
 #define CTKDICOMAPPINTERFACE_H
 
-#include <QObject>
-#include <QRect>
-
-#include "ctkDicomAppHostingTypes.h"
 #include "ctkDicomExchangeInterface.h"
 
-#include <org_commontk_dah_core_Export.h>
-
-class org_commontk_dah_core_EXPORT ctkDicomAppInterface : public ctkDicomExchangeInterface
+struct ctkDicomAppInterface : public ctkDicomExchangeInterface
 {
-  Q_OBJECT
-
-public:
 
   // Application interface methods
   virtual ctkDicomAppHosting::State getState() = 0;
+  /**
+    * Method triggered by the host. Changes the state of the hosted application.
+    *@return true if state received and not illegal in the transition diagram from the reference, false if illegal or not recognized.
+    */
   virtual bool setState(ctkDicomAppHosting::State newState) = 0;
   virtual bool bringToFront(const QRect& requestedScreenArea) = 0;
 
@@ -46,5 +41,7 @@ public:
   // inherited from ctkDicomExchangeInterface
 
 };
+
+Q_DECLARE_INTERFACE(ctkDicomAppInterface, "org.commontk.dah.core.AppInterface")
 
 #endif // CTKDICOMAPPINTERFACE_H

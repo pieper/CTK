@@ -5,6 +5,7 @@ SET(PLUGIN_export_directive "org_commontk_dah_examplehost_EXPORT")
 SET(PLUGIN_SRCS
   ctkExampleDicomHost.cpp
   ctkExampleDicomHostPlugin.cpp
+  ctkExampleDicomHostPlugin_p.h
   ctkHostedAppPlaceholderWidget.cpp
 )
 
@@ -27,7 +28,7 @@ SET(PLUGIN_resources
 SET(PLUGIN_include_directories
 )
 #Compute the plugin dependencies
-ctkMacroGetTargetLibraries(PLUGIN_target_libraries)
+ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 
 ctkMacroBuildPlugin(
   NAME ${PROJECT_NAME}

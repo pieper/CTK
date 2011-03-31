@@ -21,10 +21,14 @@
 #ifndef __ctkDICOMQueryRetrieveWidget_h
 #define __ctkDICOMQueryRetrieveWidget_h
 
+#include "ctkDICOMWidgetsExport.h"
+
 // Qt includes 
 #include <QWidget>
 
-#include "ctkDICOMWidgetsExport.h"
+
+// CTK includes
+#include <ctkDICOMDatabase.h>
 
 class ctkDICOMQueryRetrieveWidgetPrivate;
 
@@ -36,11 +40,22 @@ public:
   explicit ctkDICOMQueryRetrieveWidget(QWidget* parent=0);
   virtual ~ctkDICOMQueryRetrieveWidget();
 
+  QSharedPointer<ctkDICOMDatabase> retrieveDatabase()const;
+
 public slots:
-    void onDatabaseDirectoryChanged(const QString& directory);
-    void processQuery();
-    void onTabCloseRequested(int index);
-    void onAddToDatabase();
+  void setRetrieveDatabase(QSharedPointer<ctkDICOMDatabase> retrieveDatabase);
+  void query();
+  void retrieve();
+  void cancel();
+
+signals:
+  /// Signal emit when studies have been retrieved (user clicked on the
+  /// "Retrieve" button) or when the widget is cancelled (user clicked on the
+  /// "Cancel" button).
+  void studiesRetrieved(QStringList);
+
+protected slots:
+  void onQueryProgressChanged(int value);
 
 protected:
   QScopedPointer<ctkDICOMQueryRetrieveWidgetPrivate> d_ptr;

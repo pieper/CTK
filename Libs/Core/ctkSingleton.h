@@ -18,16 +18,13 @@
 
 =========================================================================*/
 
-/**
-\class ctkSingleton ctkSingleton
-\brief Utility macros allowing to declare a singleton
-
-*/
 
 #ifndef __ctkSingleton_h
 #define __ctkSingleton_h
 
 //
+/// \ingroup Core
+/// @{
 /// Singleton definition and declaration helpers
 //
 /// See http://www.parashift.com/c++-faq-lite/ctors.html#faq-10.12
@@ -51,7 +48,7 @@ typedef NAME Self;
 //
 /// Should be added at the bottom of the header file, after the class declaration
 //
-/// The instance (NAME##Initializer) will show up in any translation unit
+/// The instance (NAME##%Initializer) will show up in any translation unit
 /// that uses NAME.  It will make sure NAME is initialized before it is used.
 /// 
 #define CTK_SINGLETON_DECLARE_INITIALIZER(EXPORT_DIRECTIVE,NAME)   \
@@ -71,9 +68,9 @@ static NAME##Initialize NAME##Initializer;
 
 //-----------------------------------------------------------------------------
 //
-/// Implementation of NAME##Initialize class.
+/// Implementation of %NAME##%Initialize class.
 //
-/// Note: NAME##Initialize::Count and NAME::Instance Must NOT be initialized.
+/// Note: NAME##%Initialize::%Count and NAME::%Instance Must NOT be initialized.
 /// Default initialization to zero is necessary.
 //
 #define CTK_SINGLETON_DEFINE_INITIALIZER(NAME)      \
@@ -110,5 +107,6 @@ void NAME::classFinalize()                          \
                                                     \
 CTK_SINGLETON_DEFINE_INITIALIZER(NAME)
 
+///@}
 
 #endif //__ctkSingleton_h

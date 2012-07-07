@@ -354,8 +354,8 @@ void ctkPythonConsole::initialize(ctkAbstractPythonManager* newPythonManager)
   this->connect(PythonQt::self(), SIGNAL(pythonStdErr(QString)),
                 d, SLOT(printErrorMessage(QString)));
 
-  PythonQt::self()->setRedirectStdInCallBack(
-        ctkConsole::stdInRedirectCallBack, reinterpret_cast<void*>(this));
+  // TODO: this seems not to be needed - can it be safely removed?
+  //PythonQt::self()->setRedirectStdInCallBack( ctkConsole::stdInRedirectCallBack, reinterpret_cast<void*>(this));
 
   // Set primary and secondary prompt
   this->setPs1(">>> ");

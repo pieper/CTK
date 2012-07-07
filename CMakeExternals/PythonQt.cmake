@@ -58,8 +58,10 @@ if(${add_project})
         set(location_args GIT_REPOSITORY ${${proj}_GIT_REPOSITORY}
                           GIT_TAG ${revision_tag})
       else()
-        set(location_args GIT_REPOSITORY "${git_protocol}://github.com/commontk/PythonQt.git"
-                          GIT_TAG ${revision_tag})
+        #set(location_args GIT_REPOSITORY "${git_protocol}://github.com/commontk/PythonQt.git"
+        #                  GIT_TAG ${revision_tag})
+        set(location_args GIT_REPOSITORY "${git_protocol}://github.com/pieper/PythonQt.git"
+                          GIT_TAG "svn-mirror")
       endif()
 
       ExternalProject_Add(${proj}

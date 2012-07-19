@@ -33,6 +33,8 @@
 #include <QProgressDialog>
 #include <QSettings>
 #include <QSlider>
+#include <QSqlDatabase>
+#include <QSqlError>
 #include <QTabBar>
 #include <QTimer>
 #include <QTreeView>
@@ -77,8 +79,11 @@ public:
 
   QSharedPointer<ctkDICOMDatabase> DICOMDatabase;
   QSharedPointer<ctkDICOMThumbnailGenerator> ThumbnailGenerator;
+
   ctkDICOMModel DICOMModel;
   ctkDICOMFilterProxyModel DICOMProxyModel;
+  QSqlDatabase DICOMModelDatabase;
+
   QSharedPointer<ctkDICOMIndexer> DICOMIndexer;
 
   // used when suspending the ctkDICOMModel
@@ -217,7 +222,13 @@ void ctkDICOMAppWidget::setDatabaseDirectory(const QString& directory)
     return;
     }
   
-  d->DICOMModel.setDatabase(d->DICOMDatabase->database());
+  d->DICOMModelDatabase = QSqlDatabase::addDatabase("QSQLITE", "ctkDICOMModelConnection");
+  d->DICOMModelDatabase.setDatabaseName(databaseFileName);
+  if ( ! (d->DICOMModelDatabase.open()) )
+    {
+    std::cerr << "Database error: " << qPrintable(d->DICOMModelDatabase.lastError().text()) << "\n";
+    }
+  d->DICOMModel.setDatabase(d->DICOMModelDatabase);
   d->DICOMModel.setEndLevel(ctkDICOMModel::SeriesType);
   d->TreeView->resizeColumnToContents(0);
 
@@ -358,7 +369,7 @@ void ctkDICOMAppWidget::resumeModel()
 {
   Q_D(ctkDICOMAppWidget);
 
-  d->DICOMModel.setDatabase(d->DICOMDatabase->database());
+  d->DICOMModel.setDatabase(d->DICOMModelDatabase);
 }
 
 //----------------------------------------------------------------------------

@@ -124,6 +124,26 @@ public:
   /// parallel inserts are not allowed (yet)
   QMutex insertMutex;
 
+
+  ///
+  /// \brief store values of previously requested instance elements
+  /// These are meant to be internal methods used by the instanceValue and fileValue
+  /// methods, but they can be used by calling classes to populate or access
+  /// instance tag values as needed.
+  /// @param sopInstanceUID A string with the uid for a given instance
+  ///                       (corresponding file will be found via database)
+  /// @param key A group,element tag in zero-filled hex
+  /// @Returns empty string if element for uid is missing from cache
+  ///
+  /// Lightweight check of tag cache existence (once db check per runtime)
+  bool tagCacheExists ();
+  /// Create a tagCache in the current database.  Delete the existing one if it exists.
+  bool initializeTagCache ();
+  /// Return the value of a cached tag
+  QString cachedTag (const QString sopInstanceUID, const QString tag);
+  /// Insert an instance tag's value into to the cache
+  bool cacheTag (const QString sopInstanceUID, const QString tag, const QString value);
+
   /// tagCache table has been checked to exist
   bool TagCacheVerified;
   /// tag cache has independent database to avoid locking issue
@@ -673,7 +693,8 @@ QString ctkDICOMDatabase::headerValue (QString key)
 //------------------------------------------------------------------------------
 QString ctkDICOMDatabase::instanceValue(QString sopInstanceUID, QString tag)
 {
-  QString value = this->cachedTag(sopInstanceUID, tag);
+  Q_D(ctkDICOMDatabase);
+  QString value = d->cachedTag(sopInstanceUID, tag);
   if (value != "")
     {
     return value;
@@ -686,8 +707,9 @@ QString ctkDICOMDatabase::instanceValue(QString sopInstanceUID, QString tag)
 //------------------------------------------------------------------------------
 QString ctkDICOMDatabase::instanceValue(const QString sopInstanceUID, const unsigned short group, const unsigned short element)
 {
+  Q_D(ctkDICOMDatabase);
   QString tag = this->groupElementToTag(group,element);
-  QString value = this->cachedTag(sopInstanceUID, tag);
+  QString value = d->cachedTag(sopInstanceUID, tag);
   if (value != "")
     {
     return value;
@@ -708,10 +730,11 @@ QString ctkDICOMDatabase::instanceValue(const QString sopInstanceUID, const unsi
 //------------------------------------------------------------------------------
 QString ctkDICOMDatabase::fileValue(const QString fileName, QString tag)
 {
+  Q_D(ctkDICOMDatabase);
   unsigned short group, element;
   this->tagToGroupElement(tag, group, element);
   QString sopInstanceUID = this->instanceForFile(fileName);
-  QString value = this->cachedTag(sopInstanceUID, tag);
+  QString value = d->cachedTag(sopInstanceUID, tag);
   if (value != "")
     {
     return value;
@@ -722,6 +745,7 @@ QString ctkDICOMDatabase::fileValue(const QString fileName, QString tag)
 //------------------------------------------------------------------------------
 QString ctkDICOMDatabase::fileValue(const QString fileName, const unsigned short group, const unsigned short element)
 {
+  Q_D(ctkDICOMDatabase);
   // here is where the real lookup happens
   // - first we check the tagCache to see if the value exists for this instance tag
   // If not,
@@ -737,7 +761,7 @@ QString ctkDICOMDatabase::fileValue(const QString fileName, const unsigned short
 
   QString tag = this->groupElementToTag(group, element);
   QString sopInstanceUID = this->instanceForFile(fileName);
-  QString value = this->cachedTag(sopInstanceUID, tag);
+  QString value = d->cachedTag(sopInstanceUID, tag);
   if (value != "")
     {
     return value;
@@ -749,7 +773,7 @@ QString ctkDICOMDatabase::fileValue(const QString fileName, const unsigned short
   DcmTagKey tagKey(group, element);
 
   value = dataset.GetAllElementValuesAsString(tagKey);
-  this->cacheTag(sopInstanceUID, tag, value);
+  d->cacheTag(sopInstanceUID, tag, value);
   return( value );
 }
 
@@ -1364,43 +1388,41 @@ bool ctkDICOMDatabase::removePatient(const QString& patientID)
 ///
 
 //------------------------------------------------------------------------------
-bool ctkDICOMDatabase::tagCacheExists()
+bool ctkDICOMDatabasePrivate::tagCacheExists()
 {
-  Q_D(ctkDICOMDatabase);
-
-  if (d->TagCacheVerified)
+  if (this->TagCacheVerified)
     {
     return true;
     }
 
   // try to open the database if it's not already open
-  if ( !(d->TagCacheDatabase.isOpen()) )
+  if ( !(this->TagCacheDatabase.isOpen()) )
     {
     qDebug() << "TagCacheDatabase not open\n";
-    d->TagCacheDatabase = QSqlDatabase::addDatabase("QSQLITE", "TagCache");
-    d->TagCacheDatabase.setDatabaseName(d->TagCacheDatabaseFilename);
-    if ( !(d->TagCacheDatabase.open()) )
+    this->TagCacheDatabase = QSqlDatabase::addDatabase("QSQLITE", "TagCache");
+    this->TagCacheDatabase.setDatabaseName(this->TagCacheDatabaseFilename);
+    if ( !(this->TagCacheDatabase.open()) )
       {
       qDebug() << "TagCacheDatabase would not open!\n";
-      qDebug() << "TagCacheDatabaseFilename is: " << d->TagCacheDatabaseFilename << "\n";
+      qDebug() << "TagCacheDatabaseFilename is: " << this->TagCacheDatabaseFilename << "\n";
       return false;
       }
 
     //Disable synchronous writing to make modifications faster
-    QSqlQuery pragmaSyncQuery(d->TagCacheDatabase);
+    QSqlQuery pragmaSyncQuery(this->TagCacheDatabase);
     pragmaSyncQuery.exec("PRAGMA synchronous = OFF");
     pragmaSyncQuery.finish();
 
     }
 
   // check that the table exists
-  QSqlQuery cacheExists( d->TagCacheDatabase );
+  QSqlQuery cacheExists( this->TagCacheDatabase );
   cacheExists.prepare("SELECT * FROM TagCache LIMIT 1");
-  bool success = d->loggedExec(cacheExists);
+  bool success = this->loggedExec(cacheExists);
   if (success)
     {
     qDebug() << "TagCacheDatabase verified!\n";
-    d->TagCacheVerified = true;
+    this->TagCacheVerified = true;
     return true;
     }
   qDebug() << "TagCacheDatabase NOT verified based on table check!\n";
@@ -1408,37 +1430,34 @@ bool ctkDICOMDatabase::tagCacheExists()
 }
 
 //------------------------------------------------------------------------------
-bool ctkDICOMDatabase::initializeTagCache()
+bool ctkDICOMDatabasePrivate::initializeTagCache()
 {
-  Q_D(ctkDICOMDatabase);
-
   // First, drop any existing table
   if ( this->tagCacheExists() )
     {
     qDebug() << "TagCacheDatabase drop existing table\n";
-    QSqlQuery dropCacheTable( d->TagCacheDatabase );
+    QSqlQuery dropCacheTable( this->TagCacheDatabase );
     dropCacheTable.prepare( "DROP TABLE TagCache" );
-    d->loggedExec(dropCacheTable);
+    this->loggedExec(dropCacheTable);
     }
 
   // now create a table
   qDebug() << "TagCacheDatabase adding table\n";
-  QSqlQuery createCacheTable( d->TagCacheDatabase );
+  QSqlQuery createCacheTable( this->TagCacheDatabase );
   createCacheTable.prepare(
     "CREATE TABLE TagCache (SOPInstanceUID, Tag, Value, PRIMARY KEY (SOPInstanceUID, Tag))" );
-  bool success = d->loggedExec(createCacheTable);
+  bool success = this->loggedExec(createCacheTable);
   if (success)
     {
-    d->TagCacheVerified = true;
+    this->TagCacheVerified = true;
     return true;
     }
   return false;
 }
 
 //------------------------------------------------------------------------------
-QString ctkDICOMDatabase::cachedTag(const QString sopInstanceUID, const QString tag)
+QString ctkDICOMDatabasePrivate::cachedTag(const QString sopInstanceUID, const QString tag)
 {
-  Q_D(ctkDICOMDatabase);
   if ( !this->tagCacheExists() )
     {
     if ( !this->initializeTagCache() )
@@ -1446,11 +1465,11 @@ QString ctkDICOMDatabase::cachedTag(const QString sopInstanceUID, const QString 
       return( "" );
       }
     }
-  QSqlQuery selectValue( d->TagCacheDatabase );
+  QSqlQuery selectValue( this->TagCacheDatabase );
   selectValue.prepare( "SELECT Value FROM TagCache WHERE SOPInstanceUID = :sopInstanceUID AND Tag = :tag" );
   selectValue.bindValue(":sopInstanceUID",sopInstanceUID);
   selectValue.bindValue(":tag",tag);
-  d->loggedExec(selectValue);
+  this->loggedExec(selectValue);
   QString result("");
   if (selectValue.next())
     {
@@ -1460,9 +1479,8 @@ QString ctkDICOMDatabase::cachedTag(const QString sopInstanceUID, const QString 
 }
 
 //------------------------------------------------------------------------------
-bool ctkDICOMDatabase::cacheTag(const QString sopInstanceUID, const QString tag, const QString value)
+bool ctkDICOMDatabasePrivate::cacheTag(const QString sopInstanceUID, const QString tag, const QString value)
 {
-  Q_D(ctkDICOMDatabase);
   if ( !this->tagCacheExists() )
     {
     if ( !this->initializeTagCache() )
@@ -1470,10 +1488,10 @@ bool ctkDICOMDatabase::cacheTag(const QString sopInstanceUID, const QString tag,
       return false;
       }
     }
-  QSqlQuery insertTag( d->TagCacheDatabase );
+  QSqlQuery insertTag( this->TagCacheDatabase );
   insertTag.prepare( "INSERT OR REPLACE INTO TagCache VALUES(:sopInstanceUID, :tag, :value)" );
   insertTag.bindValue(":sopInstanceUID",sopInstanceUID);
   insertTag.bindValue(":tag",tag);
   insertTag.bindValue(":value",value);
-  return d->loggedExec(insertTag);
+  return this->loggedExec(insertTag);
 }

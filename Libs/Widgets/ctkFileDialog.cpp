@@ -70,6 +70,11 @@ void ctkFileDialogPrivate::init()
   // be intercepted as well
   button->installEventFilter(q);
 
+  // Don't use 'return' key to trigger dialog, since user may enter
+  // this when typing the name of the directory.
+  // http://na-mic.org/Mantis/view.php?id=2290
+  button->setDefault(false);
+
   QObject::connect(this->listView()->selectionModel(),
                    SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
                    q, SLOT(onSelectionChanged()));

@@ -485,6 +485,9 @@ ctk_lib_option(CommandLineModules/Backend/LocalProcess
 ctk_lib_option(CommandLineModules/Backend/FunctionPointer
                "Build the Command Line Module back-end for function pointers" OFF)
 
+ctk_lib_option(CommandLineModules/Widgets
+                "Build the Command Line Module QWigets" OFF)
+
 #ctk_lib_option(Visualization/XIP
 #               "Build the XIP library" OFF)
 

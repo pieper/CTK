@@ -59,62 +59,13 @@ public:
 public Q_SLOTS:
 
 Q_SIGNALS:
-  /// Emited when n
-  void databaseDirectoryChanged(const QString&);
-  /// Emited when query/retrieve operation has happened
-  void queryRetrieveFinished();
-  /// Emited when the directory import operation has completed
-  void directoryImported();
+  /// Emited when ...
 
 protected:
     QScopedPointer<ctkCmdLineModuleWidgetPrivate> d_ptr;
 protected Q_SLOTS:
-    void onImportDirectory(QString directory);
-    void onModelSelected(const QModelIndex& index);
-
-    /// To be called when a thumbnail in thumbnail list widget is selected
-    void onThumbnailSelected(const ctkThumbnailLabel& widget);
-
-    /// To be called when a thumbnail in thumbnail list widget is double-clicked
-    void onThumbnailDoubleClicked(const ctkThumbnailLabel& widget);
-
-    /// To be called when previous and next buttons are clicked
-    void onNextImage();
-    void onPreviousImage();
-    void onNextSeries();
-    void onPreviousSeries();
-    void onNextStudy();
-    void onPreviousStudy();
-
-    /// To be called when dialog finishes
-    void onQueryRetrieveFinished();
-
-    /// To be called when an entry of the tree list is collapsed
-    void onTreeCollapsed(const QModelIndex& index);
-
-    /// To be called when an entry of the tree list is expanded
-    void onTreeExpanded(const QModelIndex& index);
-
-    /// To be called when auto-play checkbox state changed
-    void onAutoPlayCheckboxStateChanged(int state);
-
-    /// Called by timer for auto-play functionality
-    void onAutoPlayTimer();
-
-    /// To be called when the value of thumbnail size slider bar is changed
-    void onThumbnailWidthSliderValueChanged(int val);
-
-    /// To be called when search parameters in query widget changed
-    void onSearchParameterChanged();
-
-    /// To be called after image preview displayed an image
-    void onImagePreviewDisplayed(int imageID, int count);
 
 private Q_SLOTS:
-
-    void onSearchPopUpButtonClicked();
-
-    void onSearchWidgetTopLevelChanged(bool topLevel);
 
 private:
   Q_DECLARE_PRIVATE(ctkCmdLineModuleWidget);

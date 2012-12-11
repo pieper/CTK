@@ -2,7 +2,7 @@
 
   Library:   CTK
 
-  Copyright (c) Kitware Inc.
+  Copyright (c) Isomics, Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -24,28 +24,19 @@
 #include <QDir>
 #include <QTimer>
 
-// ctkDICOMCore includes
-#include "ctkDICOMAppWidget.h"
+// ctkCommandLineModulesWidgets includes
+#include "ctkCmdLineModuleWidget.h"
 
 // STD includes
 #include <iostream>
 
-/* Test from build directory:
- ./CTK-build/bin/CTKDICOMWidgetsCxxTests ctkDICOMAppWidgetTest1 test.db ../CTK/Libs/DICOM/Core/Resources/dicom-sample.sql
-*/
-
-int ctkDICOMAppWidgetTest1( int argc, char * argv [] )
+int ctkCmdLineModuleWidgetTest1( int argc, char * argv [] )
 {
   QApplication app(argc, argv);
   
-  ctkDICOMAppWidget appWidget;
-  appWidget.setDatabaseDirectory(QDir::currentPath());
-  appWidget.onAddToDatabase();
-  appWidget.openImportDialog();
-  appWidget.openExportDialog();
-  appWidget.openQueryDialog();
+  ctkCmdLineModuleWidget cliWidget;
   
-  appWidget.show();
+  cliWidget.show();
 
   if (argc <= 1 || QString(argv[1]) != "-I")
     {

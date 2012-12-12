@@ -10,6 +10,7 @@ set(KIT_export_directive "CTK_COMMANDlINEMODULES_WIDGETS_EXPORT")
 # Source files
 set(KIT_SRCS
   ctkCmdLineModuleWidget.cpp
+  ctkCmdLineModuleWidget.h
   )
 
 # Headers that should run through moc

@@ -44,7 +44,7 @@ public:
   /// The XML description that defines the information
   /// about the widget contents
   /// @see ctkCmdLineModuleReference
-  void setXml(const QString xml);
+  void setXml(const QString& xml);
   const QString xml();
 
   /// The names of all the widgets
@@ -62,7 +62,8 @@ Q_SIGNALS:
   /// Emited when ...
 
 protected:
-    QScopedPointer<ctkCmdLineModuleWidgetPrivate> d_ptr;
+  QScopedPointer<ctkCmdLineModuleWidgetPrivate> d_ptr;
+
 protected Q_SLOTS:
 
 private Q_SLOTS:
@@ -70,6 +71,7 @@ private Q_SLOTS:
 private:
   Q_DECLARE_PRIVATE(ctkCmdLineModuleWidget);
   Q_DISABLE_COPY(ctkCmdLineModuleWidget);
+
 };
 
 #endif

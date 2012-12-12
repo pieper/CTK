@@ -62,7 +62,7 @@ public:
   ~ctkCmdLineModuleWidgetPrivate();
 
   ctkCmdLineModuleReference moduleReference;
-
+  QString xml;
 };
 
 //----------------------------------------------------------------------------
@@ -95,16 +95,17 @@ ctkCmdLineModuleWidget::~ctkCmdLineModuleWidget()
 }
 
 //----------------------------------------------------------------------------
-void ctkCmdLineModuleWidget::setXml(const QString xml)
+void ctkCmdLineModuleWidget::setXml(const QString& xml)
 {
   Q_D(ctkCmdLineModuleWidget);
+  d->xml = xml;
 }
 //----------------------------------------------------------------------------
 const QString ctkCmdLineModuleWidget::xml()
 {
   Q_D(ctkCmdLineModuleWidget);
 
-  return "Test Result";
+  return d->xml;
 }
 
 //----------------------------------------------------------------------------

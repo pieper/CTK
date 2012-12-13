@@ -55,7 +55,8 @@ struct ctkCmdLineModuleFrontendQtGuiPrivate
 ctkCmdLineModuleFrontendQtGui::ctkCmdLineModuleFrontendQtGui(const ctkCmdLineModuleReference& moduleRef)
   : ctkCmdLineModuleFrontend(moduleRef),
     d(new ctkCmdLineModuleFrontendQtGuiPrivate)
-{
+{ 
+  qDebug() << "\n\nFrontend constructor xml: \n\n" << moduleReference().rawXmlDescription();
 }
 
 
@@ -129,6 +130,8 @@ QObject* ctkCmdLineModuleFrontendQtGui::guiHandle() const
 
   QBuffer input;
   input.setData(moduleReference().rawXmlDescription());
+
+  qDebug() << "\n\nRaw xml: \n\n" << moduleReference().rawXmlDescription();
 
   QBuffer uiForm;
   uiForm.open(QIODevice::ReadWrite);

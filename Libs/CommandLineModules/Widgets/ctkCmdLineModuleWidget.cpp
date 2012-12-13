@@ -68,26 +68,26 @@ public:
   ctkCmdLineModuleProxyReference(ctkCmdLineModuleWidgetPrivate* privates) {
     this->widgetPrivates = privates;
   }
-  ~ctkCmdLineModuleProxyReference() {};
+  virtual ~ctkCmdLineModuleProxyReference() {};
 
-  operator bool() const {
+  virtual operator bool() const {
     return !this->widgetPrivates->xml.isNull();
   };
 
-  ctkCmdLineModuleDescription description() const {
+  virtual ctkCmdLineModuleDescription description() const {
     return this->widgetPrivates->moduleDescription;
   };
 
-  QByteArray rawXmlDescription() const {
+  virtual QByteArray rawXmlDescription() const {
     return QByteArray(this->widgetPrivates->xml.toStdString().c_str());
   };
 
-  QString xmlValidationErrorString() const {
+  virtual QString xmlValidationErrorString() const {
     // TODO
     return "";
   };
 
-  ctkCmdLineModuleBackend* backend() const {
+  virtual ctkCmdLineModuleBackend* backend() const {
     return 0;
   };
 
@@ -153,6 +153,7 @@ void ctkCmdLineModuleWidget::setXml(const QString& xml)
 
   // make a qt gui matching the module description
   d->moduleReference = new ctkCmdLineModuleProxyReference(d);
+  qDebug() << "\n\nProxy xml: \n\n" << (*d->moduleReference).rawXmlDescription();
   d->qtGui = new ctkCmdLineModuleFrontendQtGui(*d->moduleReference);
 
   d->moduleWidget = d->qtGui->guiHandle();

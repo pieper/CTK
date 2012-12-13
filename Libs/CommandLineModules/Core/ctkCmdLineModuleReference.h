@@ -49,7 +49,7 @@ public:
    * @brief Creates an invalid module reference.
    */
   ctkCmdLineModuleReference();
-  ~ctkCmdLineModuleReference();
+  virtual ~ctkCmdLineModuleReference();
 
   ctkCmdLineModuleReference(const ctkCmdLineModuleReference& ref);
   ctkCmdLineModuleReference& operator=(const ctkCmdLineModuleReference& ref);

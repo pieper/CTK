@@ -96,7 +96,7 @@ int ctkCmdLineModuleWidgetTest1( int argc, char * argv [] )
 
   if (argc <= 1 || QString(argv[1]) != "-I")
     {
-    QTimer::singleShot(500, &app, SLOT(quit()));
+    QTimer::singleShot(200, &app, SLOT(quit()));
     }
   return app.exec();
 }

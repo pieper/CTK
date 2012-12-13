@@ -27,12 +27,14 @@
 #include <QDebug>
 
 // ctkWidgets includes
-
 // ctkCommandLineModulesCore includes
 #include "ctkCmdLineModuleDescription.h"
-#include "ctkCmdLineModuleReference.h"
-#include "ctkCmdLineModuleXmlParser_p.h"
+#include "ctkCmdLineModuleFrontend.h"
 #include "ctkCmdLineModuleFrontendQtGui.h"
+#include "ctkCmdLineModuleReference.h"
+#include "ctkCmdLineModuleQtUiLoader.h"
+#include "ctkCmdLineModuleXmlParser_p.h"
+#include "ctkCmdLineModuleXslTransform.h"
 
 // ctkCommandLineModulesWidgets includes
 #include "ctkCmdLineModuleWidget.h"
@@ -41,7 +43,7 @@
 #include <ctkLogger.h>
 static ctkLogger logger("org.commontk.CommandLineModules.Widgets.ctkCmdLineModuleWidget");
 
-class ctkCmdLineModuleProxyReference;
+class ctkCmdLineModuleWidgetFrontendQtGui;
 
 //----------------------------------------------------------------------------
 class ctkCmdLineModuleWidgetPrivate
@@ -55,46 +57,74 @@ public:
 
   QString xml;
   ctkCmdLineModuleDescription moduleDescription;
-  ctkCmdLineModuleProxyReference *moduleReference;
-  QObject *moduleWidget;
+  ctkCmdLineModuleReference *moduleReference;
+  QWidget *moduleWidget;
 
-  ctkCmdLineModuleFrontendQtGui *qtGui;
+  ctkCmdLineModuleWidgetFrontendQtGui *qtGui;
 };
 
 //----------------------------------------------------------------------------
-class ctkCmdLineModuleProxyReference : public ctkCmdLineModuleReference
+class ctkCmdLineModuleWidgetFrontendQtGui : public ctkCmdLineModuleFrontendQtGui
 {
 public:
-  ctkCmdLineModuleProxyReference(ctkCmdLineModuleWidgetPrivate* privates) {
+  ctkCmdLineModuleWidgetFrontendQtGui(const ctkCmdLineModuleReference& moduleRef)
+    : ctkCmdLineModuleFrontendQtGui(moduleRef)
+    {
+    this->widgetPrivates = 0;
+    };
+  virtual ~ctkCmdLineModuleWidgetFrontendQtGui() {};
+
+  void setPrivates(ctkCmdLineModuleWidgetPrivate* privates) {
     this->widgetPrivates = privates;
-  }
-  ~ctkCmdLineModuleProxyReference() {};
-
-  operator bool() const {
-    return !this->widgetPrivates->xml.isNull();
   };
 
-  ctkCmdLineModuleDescription description() const {
-    return this->widgetPrivates->moduleDescription;
-  };
-
-  QByteArray rawXmlDescription() const {
-    return QByteArray(this->widgetPrivates->xml.toStdString().c_str());
-  };
-
-  QString xmlValidationErrorString() const {
-    // TODO
-    return "";
-  };
-
-  ctkCmdLineModuleBackend* backend() const {
-    return 0;
-  };
-
+  virtual QObject *guiHandle() const;
 
   ctkCmdLineModuleWidgetPrivate *widgetPrivates;
 };
 
+//----------------------------------------------------------------------------
+// ctkCmdLineModuleWidgetFrontendQtGui methods
+
+QObject *ctkCmdLineModuleWidgetFrontendQtGui::guiHandle() const
+{
+  // Reimplemented from superclass
+  // TODO: some of this can be factored out
+
+  if (!widgetPrivates)
+    {
+    return 0;
+    }
+
+  QBuffer input;
+  QByteArray xmlByteArray(this->widgetPrivates->xml.toStdString().c_str());
+  input.setData(xmlByteArray);
+
+  QBuffer uiForm;
+  uiForm.open(QIODevice::ReadWrite);
+
+  ctkCmdLineModuleXslTransform* xslTransform = this->xslTransform();
+  xslTransform->setInput(&input);
+  xslTransform->setOutput(&uiForm);
+
+  if (!xslTransform->transform())
+  {
+    // maybe throw an exception
+    qCritical() << xslTransform->errorString();
+    return 0;
+  }
+
+  QUiLoader* uiLoader = this->uiLoader();
+#ifdef CMAKE_INTDIR
+  QString appPath = QCoreApplication::applicationDirPath();
+  if (appPath.endsWith(CMAKE_INTDIR))
+  {
+    uiLoader->addPluginPath(appPath + "/../designer");
+  }
+#endif
+  this->widgetPrivates->moduleWidget = uiLoader->load(&uiForm);
+  return this->widgetPrivates->moduleWidget;
+}
 
 //----------------------------------------------------------------------------
 // ctkCmdLineModuleWidgetPrivate methods
@@ -146,19 +176,24 @@ void ctkCmdLineModuleWidget::setXml(const QString& xml)
   QByteArray xmlByteArray(xml.toStdString().c_str());
   QBuffer xmlBuffer;
   xmlBuffer.setData(xmlByteArray);
-  
+
   // parse the xml to get a module description
   ctkCmdLineModuleXmlParser xmlParser(&xmlBuffer, &d->moduleDescription);
   xmlParser.doParse();
 
   // make a qt gui matching the module description
-  d->moduleReference = new ctkCmdLineModuleProxyReference(d);
-  d->qtGui = new ctkCmdLineModuleFrontendQtGui(*d->moduleReference);
-
-  d->moduleWidget = d->qtGui->guiHandle();
+  d->moduleReference = new ctkCmdLineModuleReference();
+  d->qtGui = new ctkCmdLineModuleWidgetFrontendQtGui(*d->moduleReference);
+  d->qtGui->setPrivates(d);
+  d->moduleWidget = qobject_cast<QWidget *>(d->qtGui->guiHandle());
   if (d->moduleWidget)
     {
+    qDebug() << "Widget Exists";
     d->moduleWidget->setParent(this);
+    }
+  else
+    {
+    qDebug() << "Widget missing";
     }
 
   // TODO: check for exceptions
@@ -186,7 +221,8 @@ QWidget *ctkCmdLineModuleWidget::widget(const QString name)
 {
   Q_D(ctkCmdLineModuleWidget);
 
-  // TOOD - get widget for named parameter
+  // TODO - get widget for named parameter
+  return 0;
 }
 
 //----------------------------------------------------------------------------

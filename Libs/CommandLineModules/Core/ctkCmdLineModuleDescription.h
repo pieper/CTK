@@ -49,6 +49,7 @@ class CTK_CMDLINEMODULECORE_EXPORT ctkCmdLineModuleDescription
 public:
 
   ctkCmdLineModuleDescription(const ctkCmdLineModuleDescription& description);
+  ctkCmdLineModuleDescription();
   ~ctkCmdLineModuleDescription();
 
   ctkCmdLineModuleDescription& operator=(const ctkCmdLineModuleDescription& other);
@@ -136,7 +137,6 @@ private:
   friend class ctkCmdLineModuleXmlParser;
   friend struct ctkCmdLineModuleReferencePrivate;
 
-  ctkCmdLineModuleDescription();
 
   QSharedDataPointer<ctkCmdLineModuleDescriptionPrivate> d;
 

@@ -57,20 +57,20 @@ public:
   /**
    * @brief Conversion operator to test the validity of this module reference.
    */
-  operator bool() const;
+  virtual operator bool() const;
 
   /**
    * @brief Get the module description for the parameters.
    * @return The XML description as a class representation.
    * @throws ctkCmdLineModuleXmlException if the raw XML description cannot be parsed.
    */
-  ctkCmdLineModuleDescription description() const;
+  virtual ctkCmdLineModuleDescription description() const;
 
   /**
    * @brief Get the raw XML description, as supplied by the back-end.
    * @return The raw XML description.
    */
-  QByteArray rawXmlDescription() const;
+  virtual QByteArray rawXmlDescription() const;
 
   /**
    * @brief Retrieve a validation error string.
@@ -83,13 +83,13 @@ public:
    * @brief Get the URL under which the module was registered.
    * @return The module location.
    */
-  QUrl location() const;
+  virtual QUrl location() const;
 
   /**
    * @brief Get the back-end which was registered to handle this module.
    * @return The back-end handling this module.
    */
-  ctkCmdLineModuleBackend* backend() const;
+  virtual ctkCmdLineModuleBackend* backend() const;
 
 private:
 

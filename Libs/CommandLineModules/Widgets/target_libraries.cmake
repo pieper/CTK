@@ -6,5 +6,6 @@
 
 set(target_libraries
   CTKCommandLineModulesCore
+  CTKCommandLineModulesFrontendQtGui
   CTKWidgets
   )

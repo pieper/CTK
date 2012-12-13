@@ -26,6 +26,11 @@ set(KIT_UI_FORMS
 set(KIT_resources
 )
 
+include_directories(
+  ${CMAKE_SOURCE_DIR}/Libs/CommandLineModules/Frontend/QtGui
+  ${CMAKE_CURRENT_BINARY_DIR}/../Frontend/QtGui
+  )
+
 # Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
 ctkFunctionGetTargetLibraries(KIT_target_libraries)

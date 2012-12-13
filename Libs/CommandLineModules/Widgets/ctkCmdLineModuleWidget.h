@@ -51,10 +51,10 @@ public:
   QStringList names();
 
   /// The QWidget associated with the name
-  QWidget widget(QString name);
+  QWidget *widget(const QString name);
 
   /// The current value of the widget with a given name
-  QVariant value(QString name);
+  QVariant value(const QString name);
 
 public Q_SLOTS:
 

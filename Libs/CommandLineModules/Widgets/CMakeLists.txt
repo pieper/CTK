@@ -31,6 +31,9 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}/../Frontend/QtGui
   )
 
+set(QT_USE_QTUITOOLS 1)
+include(${QT_USE_FILE})
+
 # Target libraries - See CMake/ctkFunctionGetTargetLibraries.cmake
 # The following macro will read the target libraries from the file 'target_libraries.cmake'
 ctkFunctionGetTargetLibraries(KIT_target_libraries)

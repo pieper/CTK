@@ -382,6 +382,7 @@ QString ctkDICOMDataset::Decode( const DcmTag& tag, const OFString& raw ) const
     if ( qtEncodingNamesForDICOMEncodingNames.contains(d->m_SpecificCharacterSet) )
     {
       QString encodingName( qtEncodingNamesForDICOMEncodingNames[d->m_SpecificCharacterSet] );
+      std::cerr << "Encoding Name: " << encodingName.toStdString();
       if ( !decoders.contains( encodingName ) )
       {
         QTextCodec* codec = QTextCodec::codecForName( encodingName.toAscii() );
@@ -406,7 +407,18 @@ QString ctkDICOMDataset::Decode( const DcmTag& tag, const OFString& raw ) const
       }
 
       //std::cout << "Decode '" <<  raw.c_str() << "' to '" << decoders[encodingName]->toUnicode( raw.c_str() ).toLocal8Bit().constData() << "'" << std::endl;
-      return decoders[encodingName]->toUnicode( raw.c_str() );
+      if ( decoders.contains( encodingName ) )
+        {
+        QTextDecoder *decoder = decoders[encodingName];
+        if (decoder && QTextCodec::codecForCStrings())
+          {
+          return decoder->toUnicode( raw.c_str() );
+          }
+        else
+          {
+          return QString::fromLatin1(raw.c_str()); // can't convert, hope for the best
+          }
+        }
     }
     else
     {

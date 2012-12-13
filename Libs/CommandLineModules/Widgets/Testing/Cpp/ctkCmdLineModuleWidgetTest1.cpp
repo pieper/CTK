@@ -30,8 +30,7 @@
 // STD includes
 #include <iostream>
 
-static QString xml = " \
-<?xml version=\"1.0\" encoding=\"utf-8\"?> \
+static QString xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?> \
 <executable> \
   <category>Filtering.Arithmetic</category> \
   <title>Add Scalar Volumes</title> \
@@ -81,7 +80,7 @@ static QString xml = " \
       <description><![CDATA[Interpolation order if two images are in different coordinate frames or have different sampling.]]></description> \
     </integer-enumeration> \
   </parameters> \
-</executable> \
+</executable>\
 ";
 
 int ctkCmdLineModuleWidgetTest1( int argc, char * argv [] )

@@ -125,10 +125,19 @@
       <number>12</number>
      </property>
      <item>
-      <widget class="QTreeView" name="TreeView">
-       <property name="alternatingRowColors">
-        <bool>true</bool>
+      <widget class="ctkExpandableWidget" name="ExpandableTree" native="true">
+       <property name="orientations">
+        <enum>Qt::Vertical</enum>
        </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QTreeView" name="TreeView">
+           <property name="alternatingRowColors" stdset="0">
+            <bool>true</bool>
+           </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
@@ -546,6 +555,12 @@
    <class>ctkDICOMDatasetView</class>
    <extends>QWidget</extends>
    <header location="global">ctkDICOMDatasetView.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkExpandableWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkExpandableWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

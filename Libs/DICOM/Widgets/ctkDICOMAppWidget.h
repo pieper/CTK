@@ -65,17 +65,25 @@ public:
   bool searchWidgetPopUpMode();
 
 public Q_SLOTS:
+  /// Sets and opens the database
   void setDatabaseDirectory(const QString& directory);
+  /// Indicates a file has been indexed
   void onFileIndexed(const QString& filePath);
 
+  /// Handlers for top row of button behaviors
   void openImportDialog();
   void openExportDialog();
   void openQueryDialog();
   void onRemoveAction();
+  void onImportDirectory(QString directory);
 
+  /// Since the model holds onto the database, we need
+  /// be able to turn it on and off when doing bulk operations
+  /// like importing.
   void suspendModel();
   void resumeModel();
   void resetModel();
+
 
 Q_SIGNALS:
   /// Emited when directory is changed
@@ -87,8 +95,8 @@ Q_SIGNALS:
 
 protected:
     QScopedPointer<ctkDICOMAppWidgetPrivate> d_ptr;
+
 protected Q_SLOTS:
-    void onImportDirectory(QString directory);
     void onModelSelected(const QModelIndex& index);
 
     /// To be called when a thumbnail in thumbnail list widget is selected

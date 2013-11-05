@@ -20,10 +20,16 @@
 
 // Qt includes
 #include <QApplication>
+#include <QFrame>
 #include <QIcon>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMessageBox>
 #include <QSignalSpy>
 #include <QStyle>
 #include <QTimer>
+#include <QVBoxLayout>
+
 
 // CTK includes
 #include "ctkCrosshairLabel.h"
@@ -34,11 +40,42 @@
 #include <iostream>
 
 //-----------------------------------------------------------------------------
+void showImages(QImage image1, QImage image2, QString message="Image Compare")
+{
+  // Show images in a window with a text message.
+  QWidget imageCompare;
+  QVBoxLayout vbox;
+  imageCompare.setLayout(&vbox);
+  QLabel label(&imageCompare);
+  label.setText(message);
+  vbox.addWidget(&label);
+  QFrame imageFrame(&imageCompare);
+  vbox.addWidget(&imageFrame);
+  QHBoxLayout hbox;
+  imageFrame.setLayout(&hbox);
+
+  QLabel label1(&imageFrame);
+  label1.setPixmap(label1.pixmap()->fromImage(image1));
+  hbox.addWidget(&label1);
+
+  QLabel label2(&imageFrame);
+  label2.setPixmap(label1.pixmap()->fromImage(image2));
+  hbox.addWidget(&label2);
+  
+  image1.save("/tmp/image1.png");
+  image2.save("/tmp/image2.png");
+
+  imageCompare.show();
+  QMessageBox::information(0,"", message);
+}
+
+//-----------------------------------------------------------------------------
 bool imageCompare(ctkCrosshairLabel& crosshair, QString baselineDirectory,
                   QString baselineFilename)
 {
   QImage output = QPixmap::grabWidget(&crosshair).toImage();
   QImage baseline(baselineDirectory + "/" + baselineFilename);
+  showImages(baseline, output);
   return output == baseline;
 }
 
@@ -61,6 +98,8 @@ bool runBaselineTest(ctkCrosshairLabel& crosshair,
     {
     std::cerr << "ctkCrosshairLabel baseline comparison failed when "
               << qPrintable(errorMessage) << "." << std::endl;
+
+    QMessageBox::information(0,"", baselineDirectory + "/" + baselineFilename);
     return false;
     }
   return true;

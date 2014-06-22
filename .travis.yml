@@ -8,14 +8,13 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y cmake
   - sudo apt-get install -y libqt4-dev libdcmtk2-dev libinsighttoolkit3-dev libgdcm2-dev
-  - sudo apt-get install xpra xserver-xorg-video-dummy
+  - sudo apt-get install -y xpra xserver-xorg-video-dummy
 
 before_script:
-  - echo before_script in `pwd`
   - mkdir build
   - cd build
   - cmake ..
-  - "xpra --xvfb=\"Xorg +extension GLX -config `pwd`/Applications/Testing/dummy.xorg.conf -logfile ${HOME}/.xpra/xorg.log\"  start :9"
+  - "xpra --xvfb=\"Xorg +extension GLX -config `pwd`/../CTK/Applications/Testing/dummy.xorg.conf -logfile ${HOME}/.xpra/xorg.log\"  start :9"
 
 script: make && (cd CTK-build; make Experimental)
 

@@ -17,7 +17,7 @@ before_script:
   - cd build
   - "cmake -DCTK_ENABLE_DICOM:BOOL=ON .."
 
-script: "make && (cd CTK-build; env DISPLAY=:9 make Experimental)"
+script: "make && (cd CTK-build; env DISPLAY=:9 make -j3 Experimental)"
 
 after_script:
   - "xpra stop :9"

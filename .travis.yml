@@ -4,7 +4,9 @@ compiler:
   - gcc
 
 before_install:
+  - sudo add-apt-repository ppa:kalakris/cmake -y
   - sudo apt-get update -qq
+  - sudo apt-get install -y cmake
   - sudo apt-get install -y libqt4-dev libdcmtk2-dev libinsighttoolkit3-dev libgdcm2-dev
 
 before_script:

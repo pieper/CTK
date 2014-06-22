@@ -12,7 +12,7 @@ before_install:
 
 before_script:
   - "ls"
-  - "xpra --xvfb=\"Xorg +extension GLX -config ./Applications/Testing/dummy.xorg.conf -logfile ${HOME}/.xpra/xorg.log\"  start :9"
+  - "xpra --xvfb=\"Xorg +extension GLX -config `pwd`/Applications/Testing/dummy.xorg.conf -logfile ${HOME}/.xpra/xorg.log\"  start :9"
   - mkdir build
   - cd build
   - cmake ..

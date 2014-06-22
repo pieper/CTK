@@ -3,9 +3,18 @@ language: cpp
 compiler:
   - gcc
 
+before_install:
+  - echo before_install in `pwd`
+  - wget http://www.cmake.org/files/v2.8/cmake-2.8.12.2-Linux-i386.tar.gz
+  - tar xfz cmake-2.8.12.2-Linux-i386.tar.gz
+  - cd cmake-2.8.12.2-Linux-i386
+  - ./bootstrap
+  - make
+
 before_script:
+  - echo before_script in `pwd`
   - mkdir build
   - cd build
-  - cmake ..
+  - ../cmake-2.8.12.2-Linux-i386/bin/cmake ..
 
 script: make

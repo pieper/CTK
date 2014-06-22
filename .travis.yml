@@ -4,12 +4,8 @@ compiler:
   - gcc
 
 before_install:
-  - echo before_install in `pwd`
-  - wget http://www.cmake.org/files/v2.8/cmake-2.8.12.2-Linux-i386.tar.gz
-  - tar xfz cmake-2.8.12.2-Linux-i386.tar.gz
-  - cd cmake-2.8.12.2-Linux-i386
-  - ./bootstrap
-  - make
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libqt4-dev libdcmtk2-dev libinsighttoolkit3-dev libgdcm2-dev
 
 before_script:
   - echo before_script in `pwd`

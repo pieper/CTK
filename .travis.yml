@@ -11,6 +11,6 @@ before_script:
   - echo before_script in `pwd`
   - mkdir build
   - cd build
-  - ../cmake-2.8.12.2-Linux-i386/bin/cmake ..
+  - cmake ..
 
-script: make
+script: make Experimental

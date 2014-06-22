@@ -17,7 +17,7 @@ before_script:
   - cd build
   - cmake ..
 
-script: "env DISPLAY=:9 make && (cd CTK-build; make Experimental)"
+script: "make && (cd CTK-build; env DISPLAY=:9 make Experimental)"
 
 after_script:
   - "xpra stop :9"

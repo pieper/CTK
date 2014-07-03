@@ -1,4 +1,5 @@
 language: cpp
+
 compiler:
   - gcc
 
@@ -7,7 +8,14 @@ branches:
     - travis-ci
 
 before_install:
+  - sudo add-apt-repository ppa:kalakris/cmake -y
   - sudo apt-get update -qq
+  - sudo apt-get install -y cmake
   - sudo apt-get install -y libqt4-dev libdcmtk2-dev libinsighttoolkit3-dev libgdcm2-dev
+  - sudo apt-get install -y xpra xserver-xorg-video-dummy
 
-script: ctest -VV -S ./CMake/ctkTravisDashboardScript.cmake
+script: env DISPLAY=:9 ctest -VV -S ./CMake/ctkTravisDashboardScript.cmake
+
+after_script:
+  - "xpra stop :9"
+  - "cat ~/.xpra/*"

@@ -34,6 +34,9 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
   # Enable Qt libraries PythonQt wrapping if required
   if (CTK_QT_VERSION VERSION_GREATER "4")
     set(qtlibs Core Gui Widgets Network OpenGL PrintSupport Sql Svg UiTools WebKit WebKitWidgets Xml)
+    list(APPEND ep_PythonQt_args
+      -DQt5_DIR:PATH=${Qt5_DIR}
+    )
   else()
     list(APPEND ep_PythonQt_args
       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
@@ -63,7 +66,7 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
     message(FATAL_ERROR "error: Python is required to build ${PROJECT_NAME}")
   endif()
 
-  set(revision_tag 1afe4f8906345063b25047652e8962f641010a55)
+  set(revision_tag a081f9d6aa2f0f8df093e2313970689014b59db9)
   if(${proj}_REVISION_TAG)
     set(revision_tag ${${proj}_REVISION_TAG})
   endif()
@@ -88,7 +91,7 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
     BUILD_COMMAND ""
     CMAKE_CACHE_ARGS
       ${ep_common_cache_args}
-      -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+      -DPythonQt_QT_VERSION:STRING=${CTK_QT_VERSION}
       -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
       -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
       -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}

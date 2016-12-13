@@ -10,5 +10,5 @@ set(target_libraries
   CTKVisualizationVTKCore
   )
 if (CTK_QT_VERSION VERSION_GREATER "4")
-  list(APPEND target_libraries Qt5Network_LIBRARIES Qt5WebKit_LIBRARIES)
+  list(APPEND target_libraries Qt5Network_LIBRARIES Qt5WebKit_LIBRARIES Qt5WebEngine_LIBRARIES Qt5WebEngineWidget_LIBRARIES)
 endif()

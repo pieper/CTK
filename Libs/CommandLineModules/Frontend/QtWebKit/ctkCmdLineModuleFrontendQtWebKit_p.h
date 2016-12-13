@@ -24,7 +24,7 @@
 
 #include "ctkCmdLineModuleFrontend.h"
 
-class QWebView;
+class QWebEngineView;
 
 /**
  * \class ctkCmdLineModuleFrontendQtWebKit
@@ -49,7 +49,7 @@ public:
 
 private:
 
-  mutable QWebView* WebView;
+  mutable QWebEngineView* WebView;
 };
 
 #endif // CTKCMDLINEMODULEFRONTENDQTWEBKIT_H

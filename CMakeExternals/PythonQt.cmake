@@ -33,7 +33,7 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
 
   # Enable Qt libraries PythonQt wrapping if required
   if (CTK_QT_VERSION VERSION_GREATER "4")
-    set(qtlibs Core Gui Widgets Network OpenGL PrintSupport Sql Svg UiTools WebKit WebKitWidgets Xml)
+    set(qtlibs Core Gui Widgets Network OpenGL PrintSupport Sql Svg UiTools WebEngine WebEngineWidgets Xml)
     list(APPEND ep_PythonQt_args
       -DQt5_DIR:PATH=${Qt5_DIR}
     )
@@ -43,6 +43,9 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
       )
     set(qtlibs core gui network opengl sql svg uitools webkit xml)
   endif()
+
+  message("ep_PythonQt_args: ${ep_PythonQt_args}")
+  message("qtlibs: ${qtlibs}")
 
   # Set desired qt version for PythonQt
   list(APPEND ep_PythonQt_args -DPythonQt_QT_VERSION:STRING=${CTK_QT_VERSION})

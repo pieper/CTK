@@ -31,19 +31,22 @@ macro(ctkMacroSetupQt)
 
 
   if(CTK_QT_VERSION VERSION_GREATER "4")
+
     cmake_minimum_required(VERSION 2.8.12)
-    set(CTK_QT5_COMPONENTS Core Xml XmlPatterns Concurrent Sql Test)
+    set(CTK_QT5_COMPONENTS Core Xml XmlPatterns Concurrent Sql Test Network)
     if(CTK_LIB_Widgets OR CTK_LIB_CommandLineModules/Frontend/QtGui OR CTK_BUILD_ALL OR CTK_BUILD_ALL_LIBRARIES)
       list(APPEND CTK_QT5_COMPONENTS Widgets OpenGL UiTools)
     endif()
     if(CTK_LIB_CommandLineModules/Frontend/QtWebKit OR CTK_BUILD_ALL OR CTK_BUILD_ALL_LIBRARIES)
-      list(APPEND CTK_QT5_COMPONENTS WebKitWidgets)
+      list(APPEND CTK_QT5_COMPONENTS WebEngineWidgets)
     endif()
     if(CTK_LIB_XNAT/Core OR CTK_BUILD_ALL OR CTK_BUILD_ALL_LIBRARIES)
       list(APPEND CTK_QT5_COMPONENTS Script)
     endif()
     find_package(Qt5 COMPONENTS ${CTK_QT5_COMPONENTS} REQUIRED)
+
   else()
+
     set(minimum_required_qt_version "4.6")
 
     find_package(Qt4)

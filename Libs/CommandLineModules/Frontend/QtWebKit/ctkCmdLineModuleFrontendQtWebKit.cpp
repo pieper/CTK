@@ -24,9 +24,8 @@
 #include "ctkCmdLineModuleXslTransform.h"
 #include "ctkCmdLineModuleReference.h"
 
-#include <QWebView>
-#include <QWebFrame>
-#include <QWebElement>
+#include <QWebEngineView>
+//#include <QWebElement>
 #include <QBuffer>
 #include <QFile>
 
@@ -43,6 +42,8 @@ ctkCmdLineModuleFrontendQtWebKit::ctkCmdLineModuleFrontendQtWebKit(const ctkCmdL
 //----------------------------------------------------------------------------
 QObject* ctkCmdLineModuleFrontendQtWebKit::guiHandle() const
 {
+  return(NULL);
+  /*
   if (WebView) return WebView;
 
   QBuffer input;
@@ -61,32 +62,39 @@ QObject* ctkCmdLineModuleFrontendQtWebKit::guiHandle() const
     return 0;
   }
 
-  this->WebView = new QWebView;
+  this->WebView = new QWebEngineView;
   QByteArray htmlContent = htmlOutput.readAll();
   this->WebView->setHtml(htmlContent);
   return this->WebView;
+  */
 }
 
 //----------------------------------------------------------------------------
 QVariant ctkCmdLineModuleFrontendQtWebKit::value(const QString &parameter, int role) const
 {
   Q_UNUSED(role)
-  QWebElement webElement = this->WebView->page()->currentFrame()->findFirstElement("input[name=" + parameter + "]");
+  QVariant value;
+    /*
+  QWebElement webElement = this->WebView->page()->findFirstElement("input[name=" + parameter + "]");
   if (webElement.isNull()) return QVariant();
   // Work around bug https://bugs.webkit.org/show_bug.cgi?id=32865 for input elements
-  QVariant value = webElement.evaluateJavaScript("this.value");
+  value = webElement.evaluateJavaScript("this.value");
   qDebug() << "Found element" << webElement.tagName() << "with value" << value;
+  */
   return value;
 }
 
 //----------------------------------------------------------------------------
 void ctkCmdLineModuleFrontendQtWebKit::setValue(const QString &parameter, const QVariant &value, int role)
 {
+  return;
+  /*
   if (!this->WebView || role != DisplayRole) return;
 
-  QWebElement webElement = this->WebView->page()->currentFrame()->findFirstElement("input[name=" + parameter + "]");
+  QWebElement webElement = this->WebView->page()->findFirstElement("input[name=" + parameter + "]");
   if (webElement.isNull()) return;
 
   // Work around bug https://bugs.webkit.org/show_bug.cgi?id=32865 for input elements
   webElement.evaluateJavaScript(QString("this.value='%1'").arg(value.toString()));
+  */
 }

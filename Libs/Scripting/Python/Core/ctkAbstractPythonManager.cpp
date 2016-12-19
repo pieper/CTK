@@ -29,6 +29,15 @@
 // PythonQT includes
 #include <PythonQt.h>
 
+void PythonQt_init_QtGui(PyObject*);
+void PythonQt_init_QtSvg(PyObject*);
+void PythonQt_init_QtSql(PyObject*);
+void PythonQt_init_QtNetwork(PyObject*);
+void PythonQt_init_QtCore(PyObject*);
+void PythonQt_init_QtOpenGL(PyObject*);
+void PythonQt_init_QtXml(PyObject*);
+void PythonQt_init_QtUiTools(PyObject*);
+
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   #include <PythonQt_QtBindings.h>
 #endif
@@ -139,6 +148,16 @@ void ctkAbstractPythonManager::initPythonQt(int flags)
   Q_D(ctkAbstractPythonManager);
 
   PythonQt::init(flags);
+
+  // TODO: these should be called automatically
+  PythonQt_init_QtCore(0);
+  PythonQt_init_QtNetwork(0);
+  PythonQt_init_QtGui(0);
+  PythonQt_init_QtXml(0);
+  PythonQt_init_QtSvg(0);
+  PythonQt_init_QtSql(0);
+  PythonQt_init_QtOpenGL(0);
+  PythonQt_init_QtUiTools(0);
 
   // Python maps SIGINT (control-c) to its own handler.  We will remap it
   // to the default so that control-c works.
